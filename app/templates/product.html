@@ -82,6 +82,7 @@
     <div id="product-data" data-token-id="{{ token_id }}" data-first-open="{{ 'true' if first_open else 'false' }}">
         ></div>
 
+    <!-- ✅ Fixed JS portion inside <script type="module"> -->
     <script type="module">
         const apiBase = "/report";
 
@@ -96,6 +97,7 @@
             if (!sessionId) return console.error("Missing session ID");
 
             const parts = Array.from(container.querySelectorAll(".form-part"));
+            const doneBtn = container.querySelector(".btn-success");
             let currentIndex = 0;
 
             function showPart(index) {
@@ -106,11 +108,25 @@
                 const progress = document.querySelector(".progress-bar");
                 const percentage = (100 / (parts.length - 1)) * index;
                 progress.style.width = `${percentage}%`;
+                progress.setAttribute("aria-valuenow", percentage.toFixed(0));
             }
 
             function updateWordCount(el, text) {
                 const count = text.trim().split(/\s+/).filter(Boolean).length;
                 el.textContent = `Minimum: ${count}/25 words`;
+            }
+
+            function checkIfAllAnswered() {
+                let allAnswered = true;
+                parts.forEach(part => {
+                    const textarea = part.querySelector("textarea");
+                    const words = textarea.value.trim().split(/\s+/).filter(Boolean).length;
+                    if (words < 25) allAnswered = false;
+                });
+
+                if (doneBtn) {
+                    doneBtn.disabled = !allAnswered;
+                }
             }
 
             async function fetchAnswers(sessionId) {
@@ -138,6 +154,7 @@
                     const status = part.querySelector(".save-status");
                     const wordCountEl = part.querySelector(".word-count");
                     const questionId = part.getAttribute("data-question-id");
+
                     if (!textarea || !status || !wordCountEl) return;
 
                     // Prefill
@@ -146,10 +163,14 @@
                         updateWordCount(wordCountEl, textarea.value);
                     }
 
+                    // Run check on prefill
+                    checkIfAllAnswered();
+
                     // Autosave with debounce
                     let debounceTimer;
                     textarea.addEventListener("input", () => {
                         updateWordCount(wordCountEl, textarea.value);
+                        checkIfAllAnswered();
                         clearTimeout(debounceTimer);
                         debounceTimer = setTimeout(() => {
                             fetch(`${apiBase}/answer`, {
@@ -197,22 +218,51 @@
                         });
                     }
                 });
+
+                if (doneBtn) {
+                    doneBtn.addEventListener("click", async () => {
+                        doneBtn.disabled = true;
+                        doneBtn.innerText = "Submitting...";
+
+                        try {
+                            const res = await fetch(`${apiBase}/start-generation`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ token_id: tokenId })
+                            });
+
+                            const data = await res.json();
+                            if (data.status === "started") {
+                                window.location.href = "/account";
+                            } else {
+                                doneBtn.disabled = false;
+                                doneBtn.innerText = "Done ✅";
+                                alert("Something went wrong starting generation.");
+                            }
+                        } catch (err) {
+                            console.error("Generation error:", err);
+                            doneBtn.disabled = false;
+                            doneBtn.innerText = "Done ✅";
+                            alert("Network error. Try again.");
+                        }
+                    });
+                }
             }
 
-            // LOAD answers once → then setup everything
             fetchAnswers(sessionId).then(prefilled => {
                 setupListeners(prefilled);
                 showPart(currentIndex);
+
                 const welcomeModal = document.getElementById("welcomeModal");
                 const firstOpen = document.getElementById("product-data")?.getAttribute("data-first-open") === "true";
 
                 if (welcomeModal && firstOpen) {
                     welcomeModal.classList.add("show");
                 }
-
             });
         });
     </script>
+
 
 </body>
 

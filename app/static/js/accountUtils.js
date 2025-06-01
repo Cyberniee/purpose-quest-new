@@ -14,32 +14,30 @@ export function formatProductDate(productId, dateStr) {
     document.getElementById("formattedDate-" + productId).textContent = formattedDate;
 }
 
-export function getTaskStatus(taskId, tokenId) {
-    console.log("polling task-status using id: ", taskId, tokenId)
-    fetch(`/report/task_status/${taskId}?token_id=${tokenId}`)
-        .then(response => response.json())
-        .then(data => {
-            updateUIBasedOnTaskStatus(tokenId, data);
-            console.log("data.status: ", data.status);
-            if (data.status === 'SUCCESS') {
-                const productElement = document.querySelector(`div[data-token-id="${tokenId}"]`);
-                console.log("productElement: ", productElement, tokenId)
-                const productName = productElement.dataset.productName;
-                const productDescription = productElement.dataset.productDescription;
-                const productImage = productElement.dataset.productImage;
-                const product = {
-                    name: productName,
-                    description: productDescription,
-                    image: productImage,
-                    token_id: tokenId,
-                    report_link: data.report_link
-                };
-                addReportToUI(product);
-                removeProductFromList(taskId)
-            } else if (data.status === 'PROGRESS' || data.status === 'PENDING') {
-                setTimeout(() => getTaskStatus(taskId, tokenId), 5000); // Check again after 5 seconds
-            }
-        });
+export async function getTaskStatus(tokenId) {
+    const interval = setInterval(async () => {
+        const res = await fetch(`/report/progress/${tokenId}`);
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const percentage = Math.round((data.progress / data.total) * 100);
+
+        const card = document.querySelector(`[data-token-id="${tokenId}"]`);
+        const bar = card.querySelector('.progress-bar');
+        bar.style.width = `${percentage}%`;
+        bar.setAttribute('aria-valuenow', percentage);
+        bar.innerText = `${percentage}%`;
+
+        if (data.status === "completed") {
+            clearInterval(interval);
+            const button = card.querySelector('.start-btn');
+            button.disabled = false;
+            button.innerText = 'To Report';
+            button.onclick = () => {
+                window.location.href = `/report/${tokenId}`;
+            };
+        }
+    }, 3000);
 }
 
 function addReportToUI(product) {

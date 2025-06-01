@@ -20,6 +20,10 @@ class SaveAnswerPayload(BaseModel):
     report_type_id: str
     user_id: str
 
+class GenerationRequest(BaseModel):
+    token_id: str
+
+
 @report_router.get("/answers/{session_id}")
 async def get_saved_answers(session_id: UUID):
     try:
@@ -87,7 +91,8 @@ async def autosave_answer(payload: SaveAnswerPayload):
 
 
 @report_router.post("/start-generation")
-async def trigger_report_generation(token_id: str, user=Depends(AuthenticationUtils.get_authenticated_user)):
+async def trigger_report_generation(request: GenerationRequest, user=Depends(AuthenticationUtils.get_authenticated_user)):
+    token_id = request.token_id
     # 1. Validate token
     token_res = supabase.table("report_access_tokens").select("*").eq("access_token", token_id).eq("user_id", user["id"]).single().execute()
     if not token_res.data:
@@ -106,14 +111,24 @@ async def trigger_report_generation(token_id: str, user=Depends(AuthenticationUt
         "input_session_id": session_id,
         "status": "generating",
         "version": 1,
-        "generated_at": datetime.datetime.utcnow().isoformat()
+        "generated_at": datetime.now(pytz.timezone('utc')).isoformat()
     }).execute()
 
     report_id = report_res.data[0]["id"]
 
     # 4. Fetch answers
-    answers_res = supabase.table("user_answers").select("question_id, answer_text, question:question_text").eq("input_session_id", session_id).execute()
-    user_answers = [{"question": a["question"]["question_text"], "answer": a["answer_text"]} for a in answers_res.data]
+    answers_res = supabase.table("user_answers").select("question_id, answer_text, questions(question_text)").eq("input_session_id", session_id).execute()
+    user_answers = []
+    for a in answers_res.data:
+        question_text = a.get("questions", {}).get("question_text", "").strip()
+        answer_text = a.get("answer_text", "").strip()
+
+        if question_text and answer_text:
+            user_answers.append({
+                "question": question_text,
+                "answer": answer_text
+            })
+
 
     # 5. Fetch chapters and prompts
     chapters_res = supabase.table("chapters").select("id, order_index").eq("report_type_id", report_type_id).order("order_index").execute()
@@ -123,15 +138,46 @@ async def trigger_report_generation(token_id: str, user=Depends(AuthenticationUt
         prompt = prompt_res.data[0]
 
         # 6. Dispatch task
-        generate_report_chapter.delay({
-            "report_id": report_id,
-            "chapter_id": chapter["id"],
-            "chapter_prompt_id": prompt["id"],
-            "order_index": chapter["order_index"],
-            "prompt": prompt["prompt_text"],
-            "user_answers": user_answers
-        })
+        generate_report_chapter.apply_async(
+            args=[{
+                "session_id": session_id,
+                "report_id": report_id,
+                "report_type_id": report_type_id,
+                "chapter_id": chapter["id"],
+                "chapter_prompt_id": prompt["id"],
+                "order_index": chapter["order_index"],
+                "prompt": prompt["prompt_text"],
+                "user_answers": user_answers
+            }],
+            queue="reports"
+        )
 
     return {"status": "started", "report_id": report_id}
 
-    
+@report_router.get("/progress/{token_id}")
+async def get_report_progress(token_id: str, user=Depends(AuthenticationUtils.get_authenticated_user)):
+    token_res = supabase.table("report_access_tokens") \
+        .select("report_id, report_type_id") \
+        .eq("access_token", token_id) \
+        .eq("user_id", user["id"]) \
+        .single().execute()
+
+    if not token_res.data:
+        raise HTTPException(status_code=404, detail="Token not found")
+
+    report_id = token_res.data["report_id"]
+    report_type_id = token_res.data["report_type_id"]
+
+    report_res = supabase.table("reports") \
+        .select("progress, status") \
+        .eq("id", report_id) \
+        .single().execute()
+
+    total_chapters_res = supabase.table("chapters").select("id").eq("report_type_id", report_type_id).execute()
+    total_chapters = len(total_chapters_res.data)
+
+    return {
+        "progress": report_res.data["progress"],
+        "total": total_chapters,
+        "status": report_res.data["status"]
+    }

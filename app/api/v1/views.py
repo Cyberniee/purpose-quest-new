@@ -116,11 +116,13 @@ async def report_page(
 @router.get("/account", response_class=HTMLResponse)
 async def account_page(
     request: Request,
-    user: dict = Depends(get_current_user_required)
+    user: dict = Depends(get_current_user_optional)
 ):
     ### DEV ###
     dev_mode = True
     ### DEV ###
+    if not user:
+        return RedirectResponse(url="/sign-in")
     
     credits = 3
     purchases = [
@@ -171,20 +173,30 @@ async def open_product_token_page(
         # If session exists, use it; otherwise, create a new one
         if session_res.data:
             input_session = session_res.data[0]
+
+            update_fields = {}
             if token["first_open"]:
+                update_fields["first_open"] = False
+
+            if not token.get("input_session_id"):
+                update_fields["input_session_id"] = input_session["id"]
+
+            if update_fields:
                 supabase.table("report_access_tokens") \
-                    .update({"first_open": False}) \
+                    .update(update_fields) \
                     .eq("id", token["id"]) \
                     .execute()
+
             
         else:
             create_res = supabase.table("report_input_sessions").insert({
                 "user_id": str(user["id"]),
                 "report_type_id": str(report_type_id)
             }).execute()
+            
             input_session = create_res.data[0]
             supabase.table("report_access_tokens") \
-                .update({"status": "in progress"}) \
+                .update({"status": "in progress", "input_session_id": input_session['id']}) \
                 .eq("id", token["id"]) \
                 .execute()
 
