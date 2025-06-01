@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Canceled</title>
+    {% include '_common_head.html' %}
+</head>
+
+<body class="d-flex flex-column min-vh-100">    
+    {% include 'header.html' %}
+
+    <div class="flex-grow-1 d-flex justify-content-center align-items-center">
+        <div class="text-center" style="width: 18rem;">
+            <section>
+                <img class="img-fluid rounded report-img product-cover pb-4" src="/static/images/no-purchase.png">
+                 <h3>We appreciate your business! </h3>
+                 <p>If you have any questions, please send a message to
+                    <a href="mailto:info@purpose-quest.com">info@purpose-quest.com</a>.
+                </p>
+            </section>
+        </div>
+    </div>
+
+
+    {% include 'account_footer.html' %}
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+
+        if (status === 'failed') {
+            document.getElementById('status-message').textContent = "Oops! Your payment failed.";
+            document.getElementById('status-description').textContent = "You will be redirected to the products page to try again.";
+            setTimeout(function () {
+                window.location.href = '/products';
+            }, 2000); // Redirect back to products page after 5 seconds for another try
+        } else {
+            setTimeout(function () {
+                window.location.href = '/account';
+            }, 2000); // Redirect to account page after 5 seconds
+        }
+    </script>
+</body>
+
+</html>

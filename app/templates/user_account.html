@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account</title>
+    {% include '_common_head.html' %}
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    {% include 'motivator_modal.html' %}
+    {% include 'header.html' %}
+
+    <main class="container my-5 flex-grow-1">
+        <section class="bg-white p-2 products-section">
+            <h3 class="text-center">Welcome, {{ user_name }}</h3>
+
+        </section>
+        <!-- Top section for available products -->
+        <section class="mb-5 bg-white p-4 products-section">
+            <h3 class="text-center pb-2">Your Products</h3>
+            <div class="row justify-content-center">
+                {% if valid_products|length > 0 %}
+
+                {% for product in valid_products %}
+                <div class="col-md-4 mb-4 d-flex justify-content-center">
+                    <div class="card product-card valid-product-card d-flex flex-column"
+                        data-token-id="{{ product.token_id }}" data-product-name="{{ product.name }}"
+                        data-product-description="{{ product.description }}" data-product-image="{{ product.image }}">
+                        <div class="image-badge-container">
+
+                            <img class="card-img-top image-max-h" src="{{ product.image }}" loading="lazy"
+                                alt="{{ product.product_name }}">
+
+                            <!-- Badge Display Logic -->
+                            {% if product.status == "" or product.status == None %}
+                            <span class="token-status-label badge bg-primary" data-product-id="{{ product.product_id }}"
+                                data-valid="{{ product.valid }}" data-status="{{ product.status }}">New</span>
+                            {% elif product.status == "in progress" %}
+                            <span class="token-status-label badge bg-warning text-dark"
+                                data-product-id="{{ product.product_id }}" data-valid="{{ product.valid }}"
+                                data-status="{{ product.status }}">In progress</span>
+                            {% elif product.status == "done" %}
+                            <span class="token-status-label badge bg-success" data-product-id="{{ product.product_id }}"
+                                data-valid="{{ product.valid }}" data-status="{{ product.status }}">Done</span>
+                            {% elif product.status == "processing" %}
+                            <span class="token-status-label badge bg-success" data-product-id="{{ product.product_id }}"
+                                data-valid="{{ product.valid }}" data-status="{{ product.status }}">Processing...</span>
+                            {% else %}
+                            <span class="token-status-label badge bg-secondary"
+                                data-product-id="{{ product.product_id }}" data-valid="{{ product.valid }}"
+                                data-status="{{ product.status }}">...</span>
+                            {% endif %}
+                            <!-- End Badge Display Logic -->
+                        </div>
+
+                        <div class="card-body d-flex flex-column flex-grow-1">
+                            <!-- Added flex-column and flex-grow-1 -->
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <!-- <p class="card-token">{{ product.token_id }}</p> -->
+                            <p class="card-text">{{ product.description }}</p>
+
+                            <!-- product progress indicator -->
+                            <div class="progress-container pb-3" style="display:none;"
+                                data-product-id="{{ product.product_id }}" data-task-id="{{ product.task_id }}">
+                                <div class="progress-label" data-product-id="{{ product.product_id }}"></div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                                        data-product-id="{{ product.product_id }}"></div>
+                                </div>
+                            </div>
+
+
+                            <!-- Button Text Logic -->
+                            {% if product.status == "" or product.status == None %}
+                            {% set button_text = 'Start' %}
+                            {% elif product.status == "processing" %}
+                            {% set button_text = 'Processing...' %}
+                            {% elif product.status == "done" %}
+                            {% set button_text = 'Done' %}
+                            {% else %}
+                            {% set button_text = 'Open' %}
+                            {% endif %}
+
+                            <button class="btn btn-primary start-btn mt-auto" data-product-id="{{ product.product_id }}"
+                                data-product-slug="{{ product.product_slug }}" data-token-id="{{ product.token_id }}">{{
+                                button_text }}</button>
+                            <!-- End Button Text Logic -->
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+
+                {% else %}
+                <p class="col-12 text-center">No products available in your account.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Reports section -->
+        <section class="mb-5 bg-white p-4 reports-section">
+            <h3 class="text-center pb-2">Reports</h3>
+
+            <div class="row justify-content-center">
+                {% if invalid_products and invalid_products|length > 0 %}
+                <!-- Only visible when the token is invalid so no progress is shown-->
+                {% for product in invalid_products %}
+                <div class="col-md-4 mb-4 d-flex justify-content-center">
+                    <div class="card product-card invalid-product-card d-flex flex-column">
+                        <img class="card-img-top image-max-h" src="{{ product.image }}" loading="lazy"
+                            alt="{{ product.product_name }}">
+                        <div class="card-body d-flex flex-column flex-grow-1">
+
+                            <!-- Added flex-column and flex-grow-1 -->
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-token">{{ product.token_id }}</p>
+                            <p class="card-text">{{ product.description }}</p>
+
+                            <!-- product progress indicator -->
+                            <div class="progress-container py-2" data-product-id="{{ product.product_id }}">
+                                <div class="progress-label py-2" data-product-id="{{ product.product_id }}"></div>
+                                <div class="progress-bar py-2 rounded-5" data-product-id="{{ product.product_id }}">
+                                </div>
+                            </div>
+
+                            <!-- Report button Text Logic -->
+                            {% if product.status == "processing" %}
+                            {% set button_text = 'Generating...' %}
+                            {% elif product.status == "done" %}
+                            {% set button_text = 'Open Report' %}
+                            {% else %}
+                            {% set button_text = 'Generating...' %}
+                            {% endif %}
+
+                            <a class="btn btn-primary mt-auto" href="{{ product.report_link }}"
+                                data-product-id="{{ product.product_id }}"
+                                data-product-slug="{{ product.product_slug }}" data-token-id="{{ product.token_id }}"
+                                role="button">{{
+                                button_text }}</a>
+                            <!-- End Button Text Logic -->
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% else %}
+                <div class="col-12 text-center no-reports-message">
+                    <p>No reports available</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Products available for purchase -->
+        <section class="mb-5 bg-white p-4">
+            <h3 class="text-center pb-2">Products for Purchase</h3>
+            <div class="row justify-content-center"> <!-- Using justify-content-center to center the items -->
+                {% for product in available_products %}
+                <div class="col-md-4 mb-4 d-flex justify-content-center"> <!-- Added justify-content-center -->
+                    <div class="card product-card purchase-product-card d-flex flex-column">
+                        <img class="card-img-top" src="{{ product.image }}" alt="{{ product.product_name }}"
+                            style="max-height: 286px;">
+                        <div class="card-body d-flex flex-column flex-grow-1">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.description }}</p>
+                            <button class="btn btn-primary buy-btn mt-auto" data-product-id="{{ product.product_id }}"
+                                data-product-name="{{ product.name }}" data-product-slug="{{ product.product_slug }}"
+                                data-product-price="{{ product.price }}"
+                                data-product-price-id="{{ product.price_id }}">Buy for €{{product.price}}</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+
+        <!-- Past purchases -->
+        <section class="mb-5 bg-white p-4">
+            <h3 class="text-center pb-2">Past Purchases</h3>
+            <div class="card">
+                <div class="card-header d-none d-md-flex justify-content-between text-muted px-3">
+                    <!-- Adjusted padding and added flex utilities -->
+                    <span class="col-4 col-md-4">Product Name</span>
+                    <span class="col-4 col-md-4">Purchase Date</span>
+                    <span class="col-4 col-md-4">Validity</span>
+                </div>
+                <div class="table-responsive"> <!-- This makes the table scrollable on small devices -->
+                    <ul class="list-group list-group-flush">
+                        {% set combined_products = valid_products + invalid_products %}
+                        {% if combined_products|length > 0 %}
+                        {% for product in combined_products %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="col-4 col-md-4" data-token-id="product.token_id">{{ product.name }}</span>
+                            <span id="formattedDate-{{ product.id }}" class="col-4 col-md-4"
+                                data-date="{{ product.date }}"></span>
+                            <span class="col-4 col-md-4">{{ 'available' if product.valid else 'used' }}</span>
+                        </li>
+                        {% endfor %}
+                        {% else %}
+                        <li class="list-group-item">No past purchases available</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
+
+    </main>
+
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div id="toast-container" class="position-absolute top-0 end-0"></div>
+    </div>
+    {% include 'account_footer.html' %}
+
+    <div id="user-id" data-user-id="{{ user_id }}"></div>
+    <div id="report-links" data-report-id="{{ report_links }}"></div>
+
+    <script type="module">
+        import { stripe } from '/static/js/_jsEnv.js';
+        import { startProduct } from '/static/js/handleStartProduct.js';
+        import { handlePurchase } from '/static/js/handlePurchase.js';
+        import { showToast } from '/static/js/showToast.js';
+        import { btnLoader } from '/static/js/addLoader.js';
+        import { formatProductDate, getTaskStatus, checkNewUser } from '/static/js/accountUtils.js';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const flashedMessageEl = document.getElementById('flashed-message');
+            if (flashedMessageEl) {
+                const title = flashedMessageEl.getAttribute('data-title');
+                const message = flashedMessageEl.getAttribute('data-message');
+                showToast(title, message);
+            }
+
+            const validProducts = document.querySelectorAll('.valid-product-card');
+
+            validProducts.forEach(product => {
+                const statusLabel = product.querySelector('.token-status-label');
+                const status = statusLabel.getAttribute('data-status');
+                const valid = statusLabel.getAttribute('data-valid') === 'True'; // Assuming valid is a boolean
+                const taskId = product.querySelector('.progress-container').getAttribute('data-task-id');
+                const tokenId = product.getAttribute('data-token-id');
+
+                // If the product is valid and has a task ID, and the status is 'processing'
+                console.log("data for check: ", valid, taskId, status)
+                if (valid && taskId && (status === 'processing')) {
+                    console.log("set taskInterval for polling!")
+                    // Start an interval timer to check the status of the product
+                    getTaskStatus(taskId, tokenId); // Check every 5 seconds
+                }
+            });
+
+            const userIdElement = document.getElementById('user-id');
+            const userId = userIdElement.getAttribute('data-user-id');
+            const startButtons = document.querySelectorAll('.start-btn');
+            console.log(startButtons);
+
+            const buyButtons = document.querySelectorAll('.buy-btn');
+            const btns = document.querySelectorAll('.btn-primary');
+
+            btnLoader(btns); // sets the loader element to all buttons where we have a delay before executing the action.
+
+            startButtons.forEach(button => {
+                const status = button.closest('.valid-product-card').querySelector('.token-status-label').getAttribute('data-status');
+                if (status === 'processing' || status === 'done') {
+                    button.disabled = true;
+                    button.innerText = status === 'processing' ? 'Processing...' : 'Done';
+                }
+            });
+
+            startButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const productSlug = button.getAttribute('data-product-slug');
+                    const tokenId = button.getAttribute('data-token-id');
+                    startProduct(productSlug, tokenId);
+                });
+            });
+
+            // buybuttons take some data to fill the meta and keep track of purchase and link to useracct
+            buyButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const productId = button.getAttribute('data-product-id');
+                    const productName = button.getAttribute('data-product-name');
+                    const productPrice = button.getAttribute('data-product-price');
+                    const productPriceId = button.getAttribute('data-product-price-id');
+                    const productSlug = button.getAttribute('data-product-slug');
+                    handlePurchase(productId, productName, productPrice, productPriceId, productSlug, stripe);
+                });
+            });
+
+            // makes sure the date elements are readable by humans
+            const dateElements = document.querySelectorAll('[id^="formattedDate-"]');
+            dateElements.forEach(el => {
+                const productId = el.id.replace('formattedDate-', '');
+                const dateStr = el.getAttribute('data-date');
+                formatProductDate(productId, dateStr);
+            });
+
+            checkNewUser(userId);
+
+            
+        });
+    </script>
+
+</body>
+
+</html>

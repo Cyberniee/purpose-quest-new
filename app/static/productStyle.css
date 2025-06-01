@@ -1,0 +1,104 @@
+.hidden {
+    display: none;
+}
+
+textarea.form-control {
+    resize: vertical;
+    /* Allows the textarea to expand vertically */
+}
+
+.bodyPurposeQuest {
+    background-image: url('images/product_hero_1.png');
+    background-size: cover;
+    /* This will cover the entire viewport */
+    background-repeat: no-repeat;
+    /* Prevents the image from repeating in case it's too small for the container */
+    background-position: center center;
+    /* This will center the background */
+}
+
+.input-error {
+    border: 1px solid red;
+}
+
+.report-img {
+    max-height: 350px;
+    width: auto;
+}
+
+
+.tooltip {
+    display: none;
+    color: #ff0000;
+    text-align: center;
+    padding: 5px 10px;
+    border-radius: 4px;
+    position: relative;
+    z-index: 1;
+    opacity: 0.9;
+}
+
+::placeholder {
+    color: grey;
+    opacity: 1;
+    /* Firefox uses opacity */
+}
+
+::-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: grey;
+}
+
+::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: grey;
+}
+
+.progress {
+    border-radius: 0px !important;
+
+}
+
+.info-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.info-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: rgba(0, 0, 0, 0.2);
+    stroke: rgba(0, 0, 0, 0.2);
+    transition: fill 0.3s ease, stroke 0.3s ease;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+#safeIcon {
+    display: none;
+    /* Initially hidden */
+    opacity: 0;
+    /* Start with an opaque element */
+    transition: opacity 0.2s;
+    /* Transition for the opacity change */
+}

@@ -1,0 +1,46 @@
+#LogoutBtnCont {
+    padding: 0px;
+    margin: 0px;
+}
+
+.link-custom {
+    text-decoration: none !important;
+    color: #dc3545;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* Space between the icon and the text */
+    font-size: 16px;
+    /* Adjust as needed */
+    cursor: pointer;
+    background-color: transparent;
+    transition: all 0.1s;
+    /* Smooth transition for hover effect */
+    padding: 5px;
+    /* Adjust this padding to control the size of the circle. */
+    border: 2px solid #fff;
+    /* White border */
+    border-radius: 50%;
+    /* This makes it a circle. */
+    transition: 0.3s;
+}
+
+.link-custom:hover {
+    border-color: #dc3546;
+    /* Change border color to red on hover */
+    transition: 0.3s;
+}
+
+.link-custom:hover .icon {
+    color: #dc3546;
+    /* Change icon color to white on hover */
+    transition: 0.3s;
+}
+
+.custom-icon {
+    font-size: 30px;
+    color: #dc3545;
+    vertical-align: middle;
+}
+

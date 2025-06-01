@@ -1,0 +1,46 @@
+<html>
+<p> We're logging you in... hold tight </p>
+<body>
+    <script>
+        if (window.location.hash) {
+            const hash = window.location.hash.substr(1);
+            const result = hash.split('&').reduce(function (res, item) {
+                const parts = item.split('=');
+                res[parts[0]] = decodeURIComponent(parts[1] || '');
+                return res;
+            }, {});
+            console.log(result);
+
+            // Check for error in the URL fragment
+            if (result.error) {
+                console.log("Error detected in URL fragment:", result.error_description);
+                window.location.href = '/web/sign-in/'; // Redirect to the sign-in page
+            } else {
+                const accessToken = result['access_token'];
+                const refreshToken = result['refresh_token'];
+                const tokenType = result['type'];
+
+                
+                fetch('/auth/api/validate_token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ access_token: accessToken, refresh_token: refreshToken, token_type: tokenType}),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data)
+                        if (data.status === "success") {                 
+                            window.location.href = '/account'; // Redirect to the protected route
+                        } else {
+                            // Handle validation failure
+                            window.location.href = '/sign-in/'; // Redirect to the sign-in page on failure
+                        }
+                    });
+            }
+        } else {
+            // If there's no hash in the URL, redirect to the sign-in page
+            window.location.href = '/sign-in/';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purpose Quest</title>
+    {% include '_common_head.html' %}
+    <link rel="stylesheet" href='/static/productStyle.css'>
+</head>
+
+<body class="d-flex text-center bodyPurposeQuest" id="productBody">
+    <div class="cover-container d-flex w-100 min-vh-100 mx-auto px-0 flex-column">
+        {% include 'welcome_modal.html' %}
+        {% include 'header.html' %}
+
+        <div class="progress">
+            <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="50"
+                class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar"
+                style="width: 0%"></div>
+        </div>
+        <main class="container align-items-center d-flex flex-column justify-content-center" style="min-height: 80vh;">
+            <div class="row w-100">
+                <div class="col pt-5">
+                    <div class="safe-icon" id="safeIcon">
+                    </div>
+                </div>
+                <div class="col pt-5">
+                    <div class="d-flex justify-content-center align-items-start">
+                        <div class="info-icon" id="productInfo">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-heart">
+                                <path
+                                    d="M12 20.5a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Zm0 1.5c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Zm0-6a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm.053-3.533a7.8 7.8 0 0 1 .92-.767 6.97 6.97 0 0 0 .746-.61 2.31 2.31 0 0 0 .468-.635c.126-.253.188-.548.188-.883 0-.374-.082-.723-.246-1.048-.158-.324-.415-.588-.771-.792-.356-.203-.81-.305-1.362-.305-.575 0-1.045.116-1.411.347a1.991 1.991 0 0 0-.788.89c-.06.134-.11.272-.148.413-.111.414-.445.767-.874.767-.428 0-.784-.35-.71-.772.07-.407.2-.79.386-1.15.301-.583.758-1.048 1.37-1.394C10.435 6.176 11.185 6 12.07 6c.93 0 1.687.181 2.273.544.59.358 1.014.803 1.271 1.337.257.533.386 1.07.386 1.608 0 .545-.085 1.012-.254 1.403-.17.385-.375.698-.616.94-.235.242-.55.514-.943.817-.312.247-.561.46-.747.635-.18.176-.33.385-.451.627-.05.099-.087.2-.113.302-.108.424-.422.787-.86.787-.437 0-.806-.356-.76-.79a2.948 2.948 0 0 1 .797-1.743Z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="questionnaire-container" data-session-id="{{ session_id or '' }}" data-token-id="{{ token_id }}"
+                data-user-id="{{ user.id }}" data-report-type-id="{{ report_type_id }}">
+
+                {% for q in questions %}
+                <div class="question-block form-part mb-5 {% if not loop.first %}hidden{% endif %}"
+                    data-question-id="{{ q.id }}" data-index="{{ loop.index }}">
+                    <h4>{{ q.question_title }}</h4>
+                    <p>{{ q.question_text }}</p>
+                    <textarea class="form-control product-text-area" rows="4"></textarea>
+                    <div class="word-count text-muted mt-1" style="font-size: 0.85rem;">Minimum: 0/25 words</div>
+
+                    <div class="save-status text-muted mt-1" style="font-size: 0.85rem;"></div>
+
+                    <div class="mt-3">
+                        {% if not loop.first %}
+                        <button type="button" class="btn btn-secondary prevBtn">Back</button>
+                        {% endif %}
+                        {% if not loop.last %}
+                        <button type="button" class="btn btn-primary nextBtn">Next</button>
+                        {% else %}
+                        <button type="button" class="btn btn-success" disabled>Done ✅</button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </main>
+        {% include 'account_footer.html' %}
+
+    </div>
+
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div id="toast-container" class="position-absolute top-0 end-0"></div>
+    </div>
+
+    </div>
+    <div id="product-data" data-token-id="{{ token_id }}" data-first-open="{{ 'true' if first_open else 'false' }}">
+        ></div>
+
+    <script type="module">
+        const apiBase = "/report";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.getElementById("questionnaire-container");
+
+            const sessionId = container.getAttribute("data-session-id");
+            const userId = container.getAttribute("data-user-id");
+            const tokenId = container.getAttribute("data-token-id");
+            const reportTypeId = container.getAttribute("data-report-type-id");
+
+            if (!sessionId) return console.error("Missing session ID");
+
+            const parts = Array.from(container.querySelectorAll(".form-part"));
+            let currentIndex = 0;
+
+            function showPart(index) {
+                parts.forEach((part, i) => {
+                    part.classList.toggle("hidden", i !== index);
+                });
+
+                const progress = document.querySelector(".progress-bar");
+                const percentage = (100 / (parts.length - 1)) * index;
+                progress.style.width = `${percentage}%`;
+            }
+
+            function updateWordCount(el, text) {
+                const count = text.trim().split(/\s+/).filter(Boolean).length;
+                el.textContent = `Minimum: ${count}/25 words`;
+            }
+
+            async function fetchAnswers(sessionId) {
+                try {
+                    const res = await fetch(`${apiBase}/answers/${sessionId}`);
+                    const json = await res.json();
+                    if (json.status === "ok") {
+                        return json.answers.reduce((map, item) => {
+                            map[item.question_id] = item.answer_text;
+                            return map;
+                        }, {});
+                    } else {
+                        console.error("Error loading answers");
+                        return {};
+                    }
+                } catch (e) {
+                    console.error("Failed to load saved answers", e);
+                    return {};
+                }
+            }
+
+            function setupListeners(prefilledAnswers = {}) {
+                parts.forEach((part, index) => {
+                    const textarea = part.querySelector("textarea");
+                    const status = part.querySelector(".save-status");
+                    const wordCountEl = part.querySelector(".word-count");
+                    const questionId = part.getAttribute("data-question-id");
+                    if (!textarea || !status || !wordCountEl) return;
+
+                    // Prefill
+                    if (prefilledAnswers[questionId]) {
+                        textarea.value = prefilledAnswers[questionId];
+                        updateWordCount(wordCountEl, textarea.value);
+                    }
+
+                    // Autosave with debounce
+                    let debounceTimer;
+                    textarea.addEventListener("input", () => {
+                        updateWordCount(wordCountEl, textarea.value);
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(() => {
+                            fetch(`${apiBase}/answer`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    input_session_id: sessionId,
+                                    report_type_id: reportTypeId,
+                                    question_id: questionId,
+                                    answer_text: textarea.value,
+                                    user_id: userId
+                                })
+                            })
+                                .then(res => res.json())
+                                .then(json => {
+                                    status.textContent = json.status === "ok" ? "✓ Saved" : "✗ Error saving";
+                                    status.style.color = json.status === "ok" ? "green" : "red";
+                                })
+                                .catch(() => {
+                                    status.textContent = "✗ Network error";
+                                    status.style.color = "red";
+                                });
+                        }, 800);
+                    });
+
+                    // Navigation
+                    const nextBtn = part.querySelector(".nextBtn");
+                    const prevBtn = part.querySelector(".prevBtn");
+
+                    if (nextBtn) {
+                        nextBtn.addEventListener("click", () => {
+                            if (currentIndex < parts.length - 1) {
+                                currentIndex++;
+                                showPart(currentIndex);
+                            }
+                        });
+                    }
+
+                    if (prevBtn) {
+                        prevBtn.addEventListener("click", () => {
+                            if (currentIndex > 0) {
+                                currentIndex--;
+                                showPart(currentIndex);
+                            }
+                        });
+                    }
+                });
+            }
+
+            // LOAD answers once → then setup everything
+            fetchAnswers(sessionId).then(prefilled => {
+                setupListeners(prefilled);
+                showPart(currentIndex);
+                const welcomeModal = document.getElementById("welcomeModal");
+                const firstOpen = document.getElementById("product-data")?.getAttribute("data-first-open") === "true";
+
+                if (welcomeModal && firstOpen) {
+                    welcomeModal.classList.add("show");
+                }
+
+            });
+        });
+    </script>
+
+</body>
+
+</html>

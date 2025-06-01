@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Purpose Quest</title>
+	{% include '_common_head.html' %}
+	<style>
+		#footer-body {
+			background-color: #102132;
+    		color: #ddd !important;
+		}
+		.featured-logos img {
+            width: 100%; /* Ensures the image is responsive within its container */
+            height: auto; /* Maintains the aspect ratio */
+            max-width: 250px; /* Maximum width as specified */
+        }
+        .featured-logos a {
+            display: inline-block;
+            margin: 10px; /* Spacing around each logo */
+            background: #fff; /* Background color can be adjusted */
+            border-radius: 5px; /* Optional: rounds the corners of the link background */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: adds shadow for better visibility */
+        }
+	</style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+	{% include 'header.html' %}
+	<section class="hero-section">
+		<div class="container">
+			<div class="row">
+				<!-- Ensuring text is centered on small screens -->
+				<div class="col-12 col-md-7 pt-5 mb-5 align-self-center text-center text-md-start">
+					<div class="promo pe-md-3 pe-lg-5">
+						<h1 class="headline mb-3">
+							Understand Yourself, <br> Shape Your Future
+						</h1><!--//headline-->
+						<div class="subheadline mb-3">
+							Increase your self-awareness and quality of life with the help of our AI-powered self-reflection reports.
+						</div><!--//subheading-->
+	
+						<!-- Adjusting button sizes and alignment -->
+						<div class="cta-holder row gx-md-3 gy-3 gy-md-0 justify-content-center justify-content-lg-start">
+							<div class="col-12 col-sm-6 col-md-auto">
+								<a class="btn btn-primary btn-sm w-100" id="SignupBtn" href="/sign-up">Start For Free</a>
+							</div>
+							<div class="col-12 col-sm-6 col-md-auto">
+								<a class="btn btn-secondary scrollto w-100" href="#benefits-section">Learn More</a>
+							</div>
+						</div><!--//cta-holder-->
+
+						<div class="hero-quotes mt-5">
+							<div id="quotes-carousel" class="quotes-carousel carousel slide carousel-fade mb-5"
+								data-bs-ride="carousel" data-bs-interval="8000">
+								<div class="carousel-indicators">
+									<button type="button" data-bs-target="#quotes-carousel" data-bs-slide-to="0"
+										class="active" aria-current="true" aria-label="Slide 1"></button>
+									<button type="button" data-bs-target="#quotes-carousel" data-bs-slide-to="1"
+										aria-label="Slide 2"></button>
+									<button type="button" data-bs-target="#quotes-carousel" data-bs-slide-to="2"
+										aria-label="Slide 3"></button>
+								</div>
+
+								<div class="carousel-inner">
+									<div class="carousel-item active">
+										<blockquote class="quote p-4 theme-bg-light">
+											"It's a very confrontational report but actually very, very good."
+										</blockquote><!--//item-->
+										<div class="source row gx-md-3 gy-3 gy-md-0 align-items-center">
+											<!--//col-->
+											<div class="col source-info text-center text-md-start">
+												<div class="source-name">Aab</div>
+											</div><!--//col-->
+										</div><!--//source-->
+									</div><!--//carousel-item-->
+									<div class="carousel-item">
+										<blockquote class="quote p-4 theme-bg-light">
+											"The Purpose Quest report has given me a different perspective on the elements in my life that contribute to my happiness. It has also helped with dreaming about the future with a realistic vision of the future. I really recommended it if you're searching for what gives you energy or makes you a happier person."
+										</blockquote><!--//item-->
+										<div class="source row gx-md-3 gy-3 pl-2 gy-md-0 align-items-center">
+											<!--//col-->
+											<div class="col source-info text-center text-md-start">
+												<div class="source-name">Fons</div>
+											</div><!--//col-->
+										</div><!--//source-->
+									</div><!--//carousel-item-->
+									<div class="carousel-item">
+										<blockquote class="quote p-4 theme-bg-light">
+											"What a great app. It’s like baking, you throw all your ingredients (your wishes, your good stuff) in the mix and a ready plan rolls out of it.
+											very accurate and complete. So fun to read."
+										</blockquote><!--//item-->
+										<div class="source row gx-md-3 pl-2 gy-3 gy-md-0 align-items-center">
+											<!--//col-->
+											<div class="col source-info text-center text-md-start">
+												<div class="source-name">Charlotte</div>
+											</div><!--//col-->
+										</div><!--//source-->
+									</div><!--//carousel-item-->
+
+									1
+								</div><!--//carousel-inner-->
+							</div><!--//quotes-carousel-->
+
+						</div><!--//hero-quotes-->
+					</div><!--//promo-->
+				</div><!--col-->
+				<!-- Image alignment and scaling for small screens -->
+				<div class="col-12 col-md-5 mb-5 align-self-center">
+					<div class="product-cover-holder text-center">
+						<img class="img-fluid product-cover" src="static/images/hero-icon1.png" alt="report cover" style="max-width: 80%; height: auto;">
+					</div><!--//product-cover-holder-->
+				</div><!--col-->
+			</div><!--//row-->
+		</div><!--//container-->
+	</section><!--//hero-section-->
+
+	<section class="banner bg-light py-3">
+		<div class="container">
+			<div class="row align-items-center">
+				<h3 class="text-center w-100 mb-3">Featured On</h3> <!-- Ensure title is centered and has bottom margin -->
+				<div class="col text-center">
+					<!-- Each link now has mx-3 for horizontal margin and my-2 for vertical margin on smaller screens -->
+					<a href="https://ai-radar.top" class="mx-3 my-2 d-inline-block" title="AI-Radar: the top AI SaaS navigation and the top AI agents & news you need"><img src="https://ai-radar.top/logo.png" style="width: 250px; height: auto;"></a>
+
+					<a href="https://www.toolify.ai/tool/purpose-quest/?ref=embed" target="_blank" class="mx-3 my-2 d-inline-block"><img src="https://cdn.toolify.ai/featured_neutral.svg" style="width: 250px; height: 60px;" alt="Purpose Quest : Reviews, Pricing, Core features, Use cases, alternatives"></a>
+					
+					<a href="https://theresanaiforthat.com/ai/purpose-quest/?ref=featured&v=1035759" target="_blank" rel="nofollow" class="mx-3 my-2 d-inline-block"><img width="250" height="60" src="https://media.theresanaiforthat.com/featured4.png" alt="There's An AI For That"></a>
+					
+					<a href="https://aisecret.us/p/ai-engineer-lies" target="_blank" rel="nofollow noopener noreferrer" style="text-decoration: none;" class="mx-3 my-2 d-inline-block"><img src="https://media.beehiiv.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,quality=80/uploads/asset/file/93cbfd0f-282f-4817-8a75-d1487350b73b/1.png?t=1707097805" alt="" style="width: 250px; height: 60px;"></a>
+					
+					<a href="https://www.producthunt.com/products/purpose-quest/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-purpose&#0045;quest" target="_blank" class="mx-3 my-2 d-inline-block"><img width="250" height="60" src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=560037&theme=neutral" alt="Purpose Quest - Product Hunt" style="width: 250px; height: 60px;"></a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="benefits-section" class="benefits-section theme-bg-light-gradient py-5 px-4">
+		<div class="container">
+			<h2 class="section-heading text-center mb-3">Uncover Deeper Self-Awareness and Achieve Your Life Goals</h2>
+			<div class="section-intro single-col-max mx-auto text-center mb-5">
+				<p>Start a transformative journey of self-discovery with Purpose Quest, an AI-powered tool that analyzes your life story to reveal profound insights and empowers you to overcome challenges, achieve your goals, and live a more fulfilling life.</p>
+			</div>
+			<div class="row text-center">
+				<div class="item col-12 col-md-6 col-lg-4">
+					<div class="item-inner p-3 p-lg-4">
+						<div class="item-header mb-3">
+							<div class="item-icon"><i class="fab fa-js-square"></i></div>
+							<h3 class="item-heading">Unlock Self-Awareness</h3>
+						</div><!--//item-heading-->
+						<div class="item-desc">
+							By delving into the intricacies of your life story, we uncover hidden patterns, confront you with essential truths, and help you gain a deeper understanding of your motivations, desires, and core values.
+						</div><!--//item-desc-->
+					</div><!--//item-inner-->
+				</div><!--//item-->
+				<div class="item col-12 col-md-6 col-lg-4">
+					<div class="item-inner p-3 p-lg-4">
+						<div class="item-header mb-3">
+							<div class="item-icon"><i class="fab fa-rocketchat"></i></div>
+							<h3 class="item-heading">Achieve Your Life Goals</h3>
+						</div><!--//item-heading-->
+						<div class="item-desc">
+							Identify your true passions, overcome obstacles, and develop actionable strategies to achieve your most ambitious goals.
+						</div><!--//item-desc-->
+					</div><!--//item-inner-->
+				</div><!--//item-->
+				<div class="item col-12 col-md-6 col-lg-4">
+					<div class="item-inner p-3 p-lg-4">
+						<div class="item-header mb-3">
+							<div class="item-icon"><i class="fab fa-angular"></i></div>
+							<h3 class="item-heading">Unleash Your Full Potential</h3>
+						</div><!--//item-heading-->
+						<div class="item-desc">
+							Break through limiting beliefs with Purpose Quest yy unlocking your deepest insights and empowering you to take action.
+						</div><!--//item-desc-->
+					</div><!--//item-inner-->
+				</div><!--//item-->
+			</div><!--//row-->
+		</div><!--//container-->
+	</section><!--//benefits-section-->
+
+	<section id="content-section" class="content-section py-5">
+		<div class="container px-4">
+			<div class="col-12 mx-auto">
+				<div class="row">
+					<!-- Image scaling and centering for small screens -->
+					<div class="col-12 col-md-6 mb-3 mb-md-0">
+						<div class="figure-holder text-center">
+							<img class="rounded img-fluid image-max-h" src="static/images/journal mockup_person.jpg" alt="image" style="max-width: 100%; height: auto;">
+						</div><!--//figure-holder-->
+					</div><!--//col-->
+	
+					<!-- Text and content alignment for small screens -->
+					<div class="col-12 col-md-6 included-col my-auto text-center text-md-start">
+						<h2 class="section-heading">Using Timeless Principles</h2>
+						<p>Purpose Quest is based on psychological frameworks to help you find purpose and improve your self-awareness</p>
+						<div class="key-points">
+							<ul class="key-points-list list-unstyled mx-auto d-inline-block text-start">
+								<li><i class="fas fa-check-circle"></i>Viktor Frankl's Logotherapy</li>
+								<li><i class="fas fa-check-circle"></i>Carl Rogers'Person-Centered Therapy</li>
+								<li><i class="fas fa-check-circle"></i>Positive Psychology</li>
+								<li><i class="fas fa-check-circle"></i>PERMA Model</li>
+								<li><i class="fas fa-check-circle"></i>Tailored Recommendations</li>
+								<li><i class="fas fa-check-circle"></i>All captured in <strong>an online report</strong> available in your account</li>
+							</ul>
+						</div><!--//key-points-->
+						<!-- Button sizing and alignment for small screens -->
+						<a class="btn btn-primary btn-sm" id="SignupBtn" href="/sign-up">I want this report</a>
+					</div><!--//col-12-->
+				</div><!--//row-->
+			</div><!--//single-col-max-->
+		</div><!--//container-->
+	</section><!--//content-section-->
+	
+
+	<section id="reviews-section" class="reviews-section py-5">
+		<div class="container">
+			<h2 class="section-heading text-center">Reviews</h2>
+			<div class="section-intro text-center single-col-max mx-auto mb-5">They already took the leap...</div>
+			<div class="row justify-content-center">
+				<div class="item col-12 col-lg-4 p-3 mb-4">
+					<div class="item-inner theme-bg-light rounded p-4">
+
+						<blockquote class="quote">
+							"It's a very confrontational report but actually very, very good."
+						</blockquote><!--//item-->
+						<div class="source row gx-md-3 gy-3 gy-md-0">
+
+							<div class="col source-info text-center text-md-start">
+								<div class="source-name"><strong>Aab</strong></div>
+							</div><!--//col-->
+						</div><!--//source-->
+						<div class="icon-holder"><i class="fas fa-quote-right"></i></div>
+					</div><!--//inner-->
+				</div><!--//item-->
+				<div class="item col-12 col-lg-4 p-3 mb-4">
+					<div class="item-inner theme-bg-light rounded p-4">
+						<blockquote class="quote">
+							"The Purpose Quest report has given me a different perspective on the elements in my life that contribute to my happiness. It has also helped with dreaming about the future with a realistic vision of the future. I really recommended it if you're searching for what gives you energy or makes you a happier person."
+						</blockquote><!--//item-->
+						<div class="source row gx-md-3 gy-3 gy-md-0 align-items-center">
+							<div class="col source-info text-center text-md-start">
+								<div class="source-name"><strong>Fons</strong></div>
+							</div><!--//col-->
+						</div><!--//source-->
+						<div class="icon-holder"><i class="fas fa-quote-right"></i></div>
+					</div><!--//inner-->
+				</div><!--//item-->
+				<div class="item col-12 col-lg-4 p-3 mb-4">
+					<div class="item-inner theme-bg-light rounded p-4">
+						<blockquote class="quote">
+							"What a great app. It’s like baking, you throw all your ingredients (your wishes, your good stuff) in the mix and a ready plan rolls out of it. Very accurate and complete. So fun to read."
+						</blockquote><!--//item-->
+						<div class="source row gx-md-3 gy-3 gy-md-0 align-items-center">
+							<div class="col source-info text-center text-md-start">
+								<div class="source-name"><strong>Charlotte</strong></div>
+							</div><!--//col-->
+						</div><!--//source-->
+						<div class="icon-holder"><i class="fas fa-quote-right"></i></div>
+					</div><!--//inner-->
+				</div><!--//item-->
+			</div><!--//row-->
+			<div class="text-center">
+				<a class="btn btn-primary btn-sm" id="SignupBtn" href="/sign-up">Take Action Today!</a>
+			</div>
+		</div><!--//container-->
+	</section><!--//reviews-section-->
+
+	<section class="mb-5 bg-white p-4">
+		<h3 class="text-center pb-2">Purpose Quest Offer</h3>
+		<div class="row justify-content-center"> <!-- Using justify-content-center to center the items -->
+			{% for product in product_catalog %}
+			<div class="col-md-4 mb-4 d-flex justify-content-center"> <!-- Added justify-content-center -->
+				<div class="card product-card purchase-product-card d-flex flex-column">
+					<img class="card-img-top" src="{{ product.image }}" alt="{{ product.product_name }}"
+						style="max-height: 286px;">
+					<div class="card-body d-flex flex-column flex-grow-1">
+						<h5 class="card-title">{{ product.name }}</h5>
+						<p class="card-text">{{ product.description }}</p>
+						<button class="btn btn-primary buy-btn mt-auto" data-product-id="{{ product.product_id }}"
+							data-product-name="{{ product.name }}" data-product-slug="{{ product.product_slug }}"
+							data-product-price="{{ product.price }}"
+							data-product-price-id="{{ product.price_id }}">Buy for €{{product.price}}</button>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</section>
+
+
+	<div class="cta-section text-center mt-5">
+		<h2>Unlock Your True Potential, Today!</h2>
+		<a class="btn btn-primary btn-sm" id="SignupBtn" href="/sign-up">Get Started Today</a>
+	</div>
+
+	{% include 'footer.html' %}
+
+	<div id="user-id" data-user-id="{{ user_id|safe }}"></div>
+	<div id="available-products" data-products='{{ available_products|safe }}''></div>
+	<div id="user-login-check" data-logged-in="{% if user %}true{% else %}false{% endif %}"></div>
+
+	<!-- Javascript -->
+	<script src="static/js/scroll.js"></script>
+	<script type="module">
+		import { stripe } from '/static/js/_jsEnv.js'; 
+		import { handlePurchase } from '/static/js/handlePurchase.js'; 
+		import { btnLoader } from '/static/js/addLoader.js'; 
+		
+		document.addEventListener('DOMContentLoaded', function () {
+			const isLoggedIn = document.getElementById('user-login-check').getAttribute('data-logged-in') === "true"; 
+			console.log("is logged in values: ", isLoggedIn, document.querySelector('div[data-logged-in]'));
+			localStorage.removeItem('intendedProduct');
+			
+			const targetProductSlug = "purpose-quest"; 
+			const availableProductsElement = document.getElementById('available-products'); 
+			const availableProducts = JSON.parse(availableProductsElement.getAttribute('data-products'));
+			const targetProduct = availableProducts.find(product => product.product_slug === targetProductSlug);
+			const buyButtons = document.querySelectorAll('.buy-btn');
+			const btns = document.querySelectorAll('.btn-primary');
+			btnLoader(btns);
+
+			console.log("Target product: ", targetProduct);
+
+			if (targetProduct) {
+				// Get all buy buttons with the .buy-btn class
+				buyButtons.forEach(buyButton => {
+					// Update each buy button's data attributes with the target product's details
+					buyButton.setAttribute('data-product-id', targetProduct.product_id);
+					buyButton.setAttribute('data-product-name', targetProduct.name);
+					buyButton.setAttribute('data-product-price', targetProduct.price);
+					buyButton.setAttribute('data-product-priceid', targetProduct.price_id);
+					console.log("price_id: ", targetProduct.price_id);
+					buyButton.setAttribute('data-product-slug', targetProduct.product_slug);
+
+					buyButton.addEventListener('click', (e) => {
+						if (!isLoggedIn) {
+							console.log("we're not logged in!");
+							e.preventDefault();
+							// Store the intended product details in localStorage before redirecting to sign-up
+							localStorage.setItem('intendedProduct', JSON.stringify(targetProduct));
+							window.location.href = "/sign-up";
+						} else {
+							console.log("we're logged in!");
+							const productId = buyButton.getAttribute('data-product-id');
+							const productName = buyButton.getAttribute('data-product-name');
+							const productPrice = buyButton.getAttribute('data-product-price');
+							const productPriceId = buyButton.getAttribute('data-product-priceid');
+							const productSlug = buyButton.getAttribute('data-product-slug');
+							handlePurchase(productId, productName, productPrice, productPriceId, productSlug, stripe);
+						}
+					});
+				});
+			}
+		});
+
+	</script>
+
+
+</body>
+
+</html>

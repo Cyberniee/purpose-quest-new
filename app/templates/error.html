@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>And error occured!</title>
+    {% include '_common_head.html' %}
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    {% include 'header.html' %}
+
+    <div class="flex-grow-1 d-flex justify-content-center align-items-center">
+        <div class="card text-center" style="width: 18rem;">
+            <section>
+                <h1>
+                    An error occured, please try again later.
+                </h1>
+            </section>
+        </div>
+    </div>
+
+    {% include 'account_footer.html' %}
+
+</body>
+
+</html>

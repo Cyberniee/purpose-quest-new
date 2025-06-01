@@ -1,0 +1,58 @@
+<link rel="stylesheet" href="{{ static_file_url ('modalStyle.css') }}">
+
+<div class="modal" id="motivatorModal" role="dialog" aria-labelledby="motivatorModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content text-center rounded-4 align-items-center my-auto">
+            <span class="close" id="close-modal">&times;</span>
+            <div class="modal-header pt-0 pb-2" style="border-bottom: 0;">
+                <h3 class="modal-title" id="motivatorModalLabel">Welcome to Purpose Quest</h3>
+            </div>
+            <p id="motivatorModalText">Here's a gift from us to get you started on your introspective journey! Enjoy!</p>
+            <div class="row px-2 px-md-4 text-center"> <!-- Reduced horizontal padding on small screens -->
+                <!-- Card 1: LITE Product Card -->
+                <div class="col-12 col-md-6 d-flex mx-auto align-items-stretch"> <!-- Full width on small screens -->
+                    <div class="card mb-4">
+                        <img class="card-img-top image-max-h" src="/static/images/lite.png"
+                            alt="Take a deep breath before reflecting on questions">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Purpose Quest LITE</h5>
+                            <p class="card-text">A lighthearted version of Purpose Quest to give you and idea what to expect from the full product. Answer reflective questions and receive a peek into your own life!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button id="modalBtn" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    const close = document.getElementById("close-modal");
+    const modal = document.getElementById("motivatorModal");
+    function closeModal() {
+        // Get the <span> element that closes the modal
+        // When the user clicks on <span> (x), close the modal
+        document.getElementById('motivatorModal').classList.remove('show');
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            document.getElementById('motivatorModal').classList.remove('show');
+        }
+    }
+
+    document.getElementById('modalBtn').addEventListener('click', function () {
+        console.log("modalBtn clicked");
+
+        closeModal();
+    });
+
+    close.addEventListener('click', function () {
+        console.log("close clicked");
+
+        closeModal();
+    });
+
+</script>

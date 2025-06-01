@@ -1,0 +1,134 @@
+    /* The Modal (background) */
+    .modal {
+        display: none;
+        /* Hidden by default */
+        position: fixed;
+        /* Stay in place */
+        z-index: 99;
+        /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%;
+        /* Full width */
+        height: 100%;
+        /* Full height */
+        overflow: hidden;
+        /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0);
+        /* Fallback color */
+        background-color: rgba(0, 0, 0, 0.4);
+        /* Black w/ opacity */
+        opacity: 0;
+        /* Start invisible */
+        transition: opacity 0.2s;
+        /* Transition effect */
+        --bs-modal-width: auto;
+    }
+
+    /* Show the modal */
+    .modal.show {
+        display: block;
+        opacity: 1;
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        color: #333;
+        background-color: #fefefe;
+        margin: 15% auto;
+        /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        max-width: 85%;
+        transition: all 0.2s;
+        /* Transition effect */
+    }
+
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .loader {
+        display: none;
+
+    }
+
+    .loading {
+        border: 2px solid #ccc;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border-top-color: #1ecd97;
+        border-left-color: #1ecd97;
+        animation: spin 1s infinite ease-in;
+    }
+
+    .text-container {
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+        text-align: left;
+    }
+
+    .text-column {
+        max-width: 600px;
+        /* Adjust as needed */
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @media (max-width: 767px) {
+
+        /* Adjust breakpoint as needed */
+        .modal-dialog {
+            width: 95%;
+            /* Wider modal on small screens */
+        }
+
+        .modal-content {
+            padding: 10px;
+            max-width: 95%;
+            /* Reduced padding */
+        }
+
+        .image-max-h {
+            height: 150px;
+            /* Adjust height as needed */
+        }
+    }
+
+    @media (min-width: 1200) {
+
+        /* Adjust breakpoint as needed */
+        .modal-dialog {
+            width: 60%;
+            /* Wider modal on small screens */
+        }
+
+        .modal-content {
+            padding: 10px;
+            max-width: 60%;
+            /* Reduced padding */
+        }
+    }

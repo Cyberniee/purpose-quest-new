@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Purpose Quest</title>
+	{% include '_common_head.html' %}
+	<style>
+		#footer-body {
+			background-color: #102132;
+    		color: #ddd !important;
+		}
+	</style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+	{% include 'header.html' %}
+
+	<div class="container">
+        <textarea id="journalEntry" class="form-control" rows="4" placeholder="Write your journal entry here..."></textarea>
+        <button id="saveBtn" class="btn btn-primary">Save</button>
+        <button id="feedbackBtn" class="btn btn-secondary">Feedback</button>
+        <div id="feedbackArea"></div>
+        <!-- Feedback results will be displayed here -->
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="static/js/journal/interactions.js"></script>
+
+	{% include 'account_footer.html' %}
+
+</body>
+
+</html>

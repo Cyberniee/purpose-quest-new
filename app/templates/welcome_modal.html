@@ -1,0 +1,85 @@
+<link rel="stylesheet" href="{{ static_file_url('modalStyle.css') }}">
+
+<div class="modal" id="welcomeModal" role="dialog" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content rounded-4 align-items-center my-auto">
+            <span class="close" id="close-modal">&times;</span>
+            <div class="modal-header pt-0 pb-2" style="border-bottom: 0;">
+                <h3 class="modal-title" id="welcomeModalLabel">Welcome to Purpose Quest</h3>
+            </div>
+            <p id="welcomeModalText">Take about 10-15 minutes to complete the questions.</p>
+            <div class="row px-2">
+                <!-- Card 1: Take a breath -->
+                <div class="col-md-4 d-flex align-items-stretch">
+                    <div class="card mb-4">
+                        <img class="card-img-top image-max-h" src="/static/images/take_breath2.png"
+                            alt="Take a deep breath before reflecting on questions">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Take a breath</h5>
+                            <p class="card-text">Take 4 deep, slow breaths. Focus on them. This will calm your mind
+                                and help you reflect on the questions presented in Purpose Quest.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Answer elaborately -->
+                <div class="col-md-4 d-flex align-items-stretch">
+                    <div class="card mb-4">
+                        <img class="card-img-top image-max-h" src="/static/images/share_elaborate.png"
+                            alt="Share your story">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Answer elaborately</h5>
+                            <p class="card-text">Don't hold back! The more elaborate you answer, the more you
+                                uncover about yourself and the better your report will be.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Submit and wait -->
+                <div class="col-md-4 d-flex align-items-stretch">
+                    <div class="card mb-4">
+                        <img class="card-img-top image-max-h" src="/static/images/wait.png"
+                            alt="Wait for up to 15 minutes">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Submit and wait</h5>
+                            <p class="card-text">After submitting your story, in about 15 minutes your report will
+                                be ready in your account!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button id="modalBtn" class="btn btn-primary">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    const close = document.getElementById("close-modal");
+    const modal = document.getElementById("welcomeModal");
+    function closeModal() {
+        // Get the <span> element that closes the modal
+        // When the user clicks on <span> (x), close the modal
+        document.getElementById('welcomeModal').classList.remove('show');
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            document.getElementById('welcomeModal').classList.remove('show');
+        }
+    }
+
+    document.getElementById('modalBtn').addEventListener('click', function () {
+        console.log("modalBtn clicked");
+
+        closeModal();
+    });
+
+    close.addEventListener('click', function () {
+        console.log("close clicked");
+
+        closeModal();
+    });
+
+</script>

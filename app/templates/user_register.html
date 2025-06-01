@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Arnout Ulenberg">
+    <meta name="Register to Habit Hero" content="Habit Hero 0.1">
+    <meta name="description" content="">
+    <title>Register</title>
+    {%include '_common_head.html'%}
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+        
+        #floatingPassword {
+            margin-bottom: -1px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        #floatingPasswordCheck {
+            margin-bottom: 10px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+        
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+
+            .form-signin input[type="email"] {
+                margin-bottom: -1px;
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+
+
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    {%include 'header.html'%}
+
+    <main class="form-signin text-center">
+        <form id="registrationForm">
+            <div class=" d-md-flex d-lg-flex col-12 mb-2">
+                <img class="d-flex text-dark text-decoration-none mx-auto" src="..\static\images\cta_2.png" alt="Icon"
+                    style="height: 60px; margin-right: 10px;" />
+            </div>
+            <h1 class="h3 mb-3 fw-normal">Register with email</h1>
+
+            <div class="form-floating has-tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="">
+                <input type="email" class="form-control" name="email" id="floatingInput" placeholder="name@example.com"
+                    required>
+                <label for="floatingInput">Email address</label>
+            </div>
+            <div class="form-floating has-tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="">
+                <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password"
+                    required>
+                <label for="floatingPassword">Password</label>
+            </div>
+            <div class="form-floating has-tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="">
+                <input type="password" class="form-control" name="password-check" id="floatingPasswordCheck"
+                    placeholder="Password" required>
+                <label for="floatingPassword">Repeat password</label>
+            </div>
+
+            <button class="w-100 btn btn-lg btn-primary my-2" type="submit">Register</button>
+            <p class="text-muted my-2">Or login <a href="./sign-in">here</a></p>
+
+        </form>
+        <div id="errorMessage" class="alert alert-danger" role="alert" style="display:none;"></div>
+        <div id="successMessage" class="alert alert-success" role="alert" style="display:none;"></div>
+        <div id="authMessage" class="alert alert-danger" style="display: none;"></div>
+
+    </main>
+    {%include 'account_footer.html'%}
+
+    <script type="module">
+        import { getCookie, displayAuthMessage, clearErrSucMessages } from "../static/js/login_reg_utils.js"
+        import { setupInputListeners, initializeTooltips, hideTooltipOnInput } from "../static/js/utils.js"
+        import { activateLoader } from "../static/js/addLoader.js"
+
+        // Function to extract query parameters from the URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        function validateRegistrationFormAndSubmit(formId, successCallback, errorCallback) {
+            clearErrSucMessages();
+
+            const form = document.getElementById(formId);
+            const submitBtn = form.querySelector('.btn-primary'); // Assuming there's only one primary button per form
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                var email = document.getElementById('floatingInput').value;
+                var password = document.getElementById('floatingPassword').value;
+                var phone = getQueryParam('phone'); // Extract the phone parameter from URL
+
+                // Simple form validation
+                if (!email || !password) {
+                    alert('Please fill in all fields.'); // You can replace this with a more user-friendly message or tooltip
+                    return;
+                }
+
+                // Email format validation
+                var emailInput = document.getElementById('floatingInput');
+                if (!/^\S+@\S+\.\S+$/.test(emailInput.value)) {
+                    emailInput.setAttribute('title', 'Please enter a valid email address.');
+                    var tooltip = bootstrap.Tooltip.getInstance(emailInput) || new bootstrap.Tooltip(emailInput);
+                    tooltip.show();
+                    return;
+                } else {
+                    var tooltip = bootstrap.Tooltip.getInstance(emailInput);
+                    if (tooltip) {
+                        tooltip.hide();
+                    }
+                    emailInput.setAttribute('title', '');
+                }
+
+                // Password complexity validation
+                var passwordInput = document.getElementById('floatingPassword');
+                if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{6,}/.test(passwordInput.value)) {
+                    // Update tooltip title for password validation
+                    passwordInput.setAttribute('title', 'Password must contain at least one number, one lowercase and one uppercase letter, one special character, and be at least 6 characters long.');
+                    // Initialize or update the tooltip
+                    var tooltip = bootstrap.Tooltip.getInstance(passwordInput) || new bootstrap.Tooltip(passwordInput);
+                    tooltip.show();
+                    return;
+                }
+
+                // validate match
+                var passwordInputCheck = document.getElementById('floatingPasswordCheck');
+                if (passwordInputCheck.value != passwordInput.value) {
+                    passwordInputCheck.setAttribute('title', 'Please make sure both passwords match');
+
+                    var tooltip = bootstrap.Tooltip.getInstance(passwordInputCheck) || new bootstrap.Tooltip(passwordInputCheck);
+                    tooltip.show();
+                    return;
+                } else {
+                    // Ensure the tooltip is not shown if the validation passes
+                    var tooltip = bootstrap.Tooltip.getInstance(passwordInput);
+                    if (tooltip) {
+                        tooltip.hide();
+                    }
+                    // Clear the title attribute to avoid old messages being shown
+                    passwordInput.setAttribute('title', '');
+                }
+
+                // Activate loader
+                activateLoader(submitBtn);
+
+                fetch('/auth/sign_up', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email, password: password, phone: phone })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            document.getElementById('floatingInput').value = '';
+                            document.getElementById('floatingPassword').value = '';
+                            document.getElementById('successMessage').innerText = data.message;
+                            document.getElementById('successMessage').style.display = 'block';
+                            if (data.message === "You already have an account with us, so we've signed you in.") {
+                                setTimeout(() => { window.location.href = '/account'; }, 500);
+                            }
+                        } else {
+                            document.getElementById('errorMessage').innerText = data.message;
+                            document.getElementById('errorMessage').style.display = 'block';
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            displayAuthMessage();
+            initializeTooltips();
+            setupInputListeners();
+            validateRegistrationFormAndSubmit('registrationForm', (data) => {
+                document.getElementById('successMessage').innerText = data.message;
+                document.getElementById('successMessage').style.display = 'block';
+                setTimeout(() => { window.location.href = '/account'; }, 500);
+            }, (errorMessage) => {
+                document.getElementById('errorMessage').innerText = errorMessage;
+                document.getElementById('errorMessage').style.display = 'block';
+            });
+        });
+
+
+    </script>
+
+</body>
+
+</html>

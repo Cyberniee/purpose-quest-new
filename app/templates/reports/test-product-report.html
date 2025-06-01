@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Report</title>
+</head>
+
+<body>
+
+    <div id="report-container"></div>
+
+    <div id="report-data" data-report="{{ report_data|tojson|safe }}"></div>
+
+</body>
+
+<script>
+    function generateHtmlFromJson(jsonObject, depth = 1) {
+        let htmlString = '';
+        for (const [key, value] of Object.entries(jsonObject)) {
+            if (Array.isArray(value)) { // Handling an array of topics
+                value.forEach((topicObj) => {
+                    htmlString += generateHtmlFromJson(topicObj, depth + 1);
+                });
+            } else if (typeof value === 'object') { // Handling nested objects
+                let headerTag = (depth === 1) ? 'h1' : 'h3';
+                if (value.Header) {
+                    htmlString += `<${headerTag}>${value.Header}</${headerTag}>`;
+                } else {
+                    htmlString += `<${headerTag}>${key}</${headerTag}>`;
+                }
+                // Recursively call the function for nested objects
+                htmlString += generateHtmlFromJson(value, depth + 1);
+            } else { // Handling leaf nodes (actual content)
+                if (key !== "Header") {
+                    htmlString += `<p>${value}</p>`;
+                }
+            }
+        }
+        return htmlString;
+    }
+
+    const reportHtml = generateHtmlFromJson(reportJson);
+    document.getElementById('report-container').innerHTML = reportHtml;
+
+</script>
+
+
+</html>

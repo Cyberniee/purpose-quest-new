@@ -1,0 +1,37 @@
+<div id="header-bg-main">
+    <div class="container header-container mx-auto mw-100">
+        <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between mb-2 pt-2 pb-lg-2 pb-md-0">
+            <div class="container">
+                <nav class="navbar navbar-light">
+                    <div class=" d-md-flex d-lg-flex col-12 col-md-4 mb-2 text-center text-lg-left text-md-left">
+                        <a href="/"
+                            class="d-flex align-items-center text-dark text-decoration-none justify-content-center justify-content-md-start"
+                            style="font-size: 1.6rem;font-weight: 600;">
+                            Purpose Quest
+                        </a>
+                    </div>
+
+                    {% if user %}
+                    <div class="col-12 col-md-6 text-center text-md-end">
+
+                        <a class="btn btn-primary btn-sm" id="acctBtn" href="/account">My
+                            Account</a>
+                        <div class="btn align-items-center justify-content-center px-3" id="LogoutBtnCont">
+                            <a href="/auth/sign_out" class="link-custom" id="LogoutBtn">
+                                <i class="material-icons custom-icon icon">logout</i>
+                            </a>
+                        </div>
+                    </div>
+
+                    {% else %}
+                    <div class="col-12 col-md-6 text-center text-md-end">
+                        <a class="btn btn-secondary btn-sm" id="LoginBtn" href="/sign-in"
+                            style="font-weight: 400;">Login</a>
+                        <a class="btn btn-primary btn-sm" id="SignupBtn" href="/sign-up">Sign up</a>
+                    </div>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+    </div>
+</div>

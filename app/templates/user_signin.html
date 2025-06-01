@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Arnout Ulenberg">
+  <meta name="Sign In to Habit Hero" content="Habit Hero 0.1">
+  <meta name="description" content="">
+  <title>Sign In</title>
+  <!-- Bootstrap core CSS -->
+  <!-- <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+
+
+  <!-- Custom styles for this template -->
+  {%include '_common_head.html'%}
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  {%include 'header.html'%}
+
+  <main class="form-signin text-center">
+    <form id="loginForm">
+      <div class=" d-md-flex d-lg-flex col-12 mb-2">
+        <img class="d-flex text-dark text-decoration-none mx-auto" src="..\static\images\cta_2.png" alt="Icon"
+          style="height: 60px; margin-right: 10px;" />
+      </div>
+      <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+      <div class="form-floating has-tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="">
+        <input type="email" class="form-control" name="email" id="floatingInput" placeholder="name@example.com"
+          value="{{email}}">
+        <label for="floatingInput">Email address</label>
+      </div>
+      <div class="form-floating has-tooltip" data-bs-toggle="tooltip" data-bs-placement="right" title="">
+        <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
+        <label for="floatingPassword">Password</label>
+      </div>
+
+      <button class="w-100 btn btn-lg btn-primary my-2" type="submit">Sign in</button>
+      <p class="text-muted my-2">Not registered? <a href="https://wa.me/message/TQYZDV4QEFMXF1">Be sure to start here on whatsapp!</a></p>
+      <p class="text-muted my-2"><a href="./recovery">Forgot password</a></p>
+    </form>
+    <div id="errorMessage" class="alert alert-danger" role="alert" style="display:none;"></div>
+    <div id="successMessage" class="alert alert-success" role="alert" style="display:none;"></div>
+    <div id="authMessage" class="alert alert-danger" style="display: none;"></div>
+
+  </main>
+  {%include 'account_footer.html'%}
+
+  <script type="module">
+
+    import { getCookie, displayAuthMessage, clearErrSucMessages } from "../static/js/login_reg_utils.js"
+    import { setupInputListeners, initializeTooltips, hideTooltipOnInput } from "../static/js/utils.js"
+    import { activateLoader } from "../static/js/addLoader.js"
+
+
+    function validateFormAndSubmit(formId, successCallback, errorCallback) {
+      clearErrSucMessages();
+
+      const form = document.getElementById(formId);
+      const submitBtn = form.querySelector('.btn-primary'); // Assuming there's only one primary button per form
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        
+        // Check if email is empty        
+        var emailInput = document.getElementById('floatingInput');
+        if (!emailInput.value.trim()) { // Using trim() to ensure whitespace is not considered as filled
+          emailInput.setAttribute('title', 'Please fill in your email address.');
+          var tooltipEmail = bootstrap.Tooltip.getInstance(emailInput) || new bootstrap.Tooltip(emailInput);
+          tooltipEmail.show();
+          // Optionally, focus the email input field
+          emailInput.focus();
+          return; // Stop further execution
+        } else {
+          // Hide tooltip if previously shown
+          var tooltipEmail = bootstrap.Tooltip.getInstance(emailInput);
+          if (tooltipEmail) {
+            tooltipEmail.hide();
+          }
+          emailInput.setAttribute('title', ''); // Clear the title to avoid outdated messages
+        }
+
+        // Check if password is empty
+        var passwordInput = document.getElementById('floatingPassword');
+        if (!passwordInput.value.trim()) { // Using trim() to ensure whitespace is not considered as filled
+          passwordInput.setAttribute('title', 'Please fill in your password.');
+          var tooltipPassword = bootstrap.Tooltip.getInstance(passwordInput) || new bootstrap.Tooltip(passwordInput);
+          tooltipPassword.show();
+          // Optionally, focus the password input field
+          passwordInput.focus();
+          return; // Stop further execution
+        } else {
+          // Hide tooltip if previously shown
+          var tooltipPassword = bootstrap.Tooltip.getInstance(passwordInput);
+          if (tooltipPassword) {
+            tooltipPassword.hide();
+          }
+          passwordInput.setAttribute('title', ''); // Clear the title to avoid outdated messages
+        }
+        
+        // Activate the loader
+        activateLoader(submitBtn);
+
+
+        // Proceed with fetch if validations pass
+        fetch('/auth/sign_in', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: emailInput.value, password: passwordInput.value })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === "success") {
+              // Display success message then redirect
+              document.getElementById('successMessage').innerText = data.message;
+              document.getElementById('successMessage').style.display = 'block';
+              setTimeout(() => {
+                window.location.href = '/account';
+              }, 500); // Redirect after 0.5 seconds
+            } else {
+              const errorElement = document.getElementById('errorMessage');
+              if (errorElement) { // Check if the element exists
+                errorElement.innerText = data.message || 'An error occurred.';
+                errorElement.style.display = 'block';
+              }
+            }
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            const errorElement = document.getElementById('errorMessage');
+            if (errorElement) { // Check if the element exists
+              errorElement.innerText = 'Sign-in failed. Please try again.';
+              errorElement.style.display = 'block';
+            }
+          });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      displayAuthMessage();
+      initializeTooltips();
+      setupInputListeners();
+      validateFormAndSubmit('loginForm', (data) => {
+        document.getElementById('successMessage').innerText = data.message;
+        document.getElementById('successMessage').style.display = 'block';
+        setTimeout(() => { window.location.href = '/account'; }, 500);
+      }, (errorMessage) => {
+        document.getElementById('errorMessage').innerText = errorMessage;
+        document.getElementById('errorMessage').style.display = 'block';
+      });
+    });
+  </script>
+</body>
+
+</html>

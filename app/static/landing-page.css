@@ -1,0 +1,43 @@
+.hero-section {
+    background-image: url('static\images\Landing_hero_2.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    color: black;
+}
+
+.problem-section, .solution-section {
+    padding: 50px 0;
+}
+
+.problem-section img, .solution-section img {
+    max-width: 500px;
+    max-height: 500px;
+}
+
+.problem-section .text-content, .solution-section .text-content {
+    background-color: #f5f5f5;
+    padding: 20px;
+    max-width: 50%;
+}
+
+.text-neutral {
+    color: #666;
+}
+
+.font-primary {
+    font-family: var(--font-primary);
+    font-weight: var(--font-primary-weight);
+}
+
+.font-secondary {
+    font-family: var(--font-secondary);
+    font-weight: var(--font-secondary-weight);
+}
+
+/* For larger screens */
+@media (min-width: 992px) {
+    .problem-section {
+        flex-direction: row-reverse;
+    }
+}

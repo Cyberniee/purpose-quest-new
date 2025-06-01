@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy</title>
+    {% include '_common_head.html' %}
+
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="container mt-5">
+        <h1>Privacy Statement</h1>
+        <p>Effective date: June 24, 2023</p>
+        <p>This Privacy Statement is issued by Purpose-Quest, operating the website www.purpose-quest.com (hereinafter "we",
+            "our", "us"). This statement explains how we, in accordance with the General Data Protection Regulation
+            (GDPR), handle the personal data of our users (hereinafter "you", "your").</p>
+
+        <h2>What Data Do We Collect?</h2>
+        <p>Purpose Quest collects the following data:</p>
+        <ul>
+            <li>Personal identification information such as name, email address, and locale for users signing in via
+                Google integration on Auth0.</li>
+            <li>Google user ID, profile picture, and social sign-in data.</li>
+            <li>Login details like IP address, login time, and login count.</li>
+            <li>Email address and verification status for users signing up with email and password.</li>
+            <li>Auth0 user ID and login details for email sign-ups.</li>
+        </ul>
+
+        <h2>How Do We Collect Your Data?</h2>
+        <p>Your data is collected directly when you:</p>
+        <ul>
+            <li>Sign up for our service using Google integration or email and password via Auth0.</li>
+            <li>Voluntarily share your story within our products.</li>
+        </ul>
+
+        <h2>How Will We Use Your Data?</h2>
+        <p>Purpose Quest uses your data solely for app functionality, enabling you to access and use our services
+            effectively.</p>
+
+        <h2>How Do We Store Your Data?</h2>
+        <p>Your login data is stored securely by Auth0, adhering to their <a
+                href="https://auth0.com/docs/secure/data-privacy-and-compliance">Data Privacy and Compliance</a>
+            policies.</p>
+        <p>Your story data is stored in a Supabase database, encrypted using Fernet encryption. For more details, refer
+            to Supabase's <a href="https://supabase.com/privacy">Privacy Policy</a>.</p>
+        <p>Payments are processed via Stripe, and related data is handled according to Stripe's <a
+                href="https://stripe.com/privacy">Privacy Policy</a>.</p>
+
+        <h2>Marketing</h2>
+        <p>Purpose Quest does not use your data for marketing purposes.</p>
+
+        <h2>What Are Your Data Protection Rights?</h2>
+        <p>You have various data protection rights, including:</p>
+        <ul>
+            <li>The right to access, rectify, or erase your data.</li>
+            <li>The right to restrict processing, object to processing, and data portability.</li>
+        </ul>
+        <p>To exercise these rights, please email info@purpose-quest.com.</p>
+
+        <h2>Cookies</h2>
+        <p>We use functional session-related cookies, managed by our server, containing only your account ID.</p>
+
+        <h2>Privacy Policies of Other Websites</h2>
+        <p>Our service may link to other websites. Please note that our privacy policy applies only to our website.
+            Other websites have their own privacy policies.</p>
+
+        <h2>Changes to Our Privacy Policy</h2>
+        <p>We regularly review and update our privacy policy. Changes are not proactively communicated but are agreed
+            upon during each product access.</p>
+
+        <h2>How to Contact Us</h2>
+        <p>For any privacy-related concerns, you can contact us at info@purpose-quest.com.</p>
+
+        <h2>How to Contact the Appropriate Authorities</h2>
+        <p>In the Netherlands, you can contact the Autoriteit Persoonsgegevens for any data protection concerns. For
+            more information, visit their <a href="https://autoriteitpersoonsgegevens.nl/en/contact">contact page</a>.
+        </p>
+
+    </div>
+    {% include 'account_footer.html' %}
+
+
+</body>
+
+</html>

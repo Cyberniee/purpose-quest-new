@@ -1,0 +1,288 @@
+# app/api/v1/views.py
+import os, logging
+from uuid import UUID
+from datetime import datetime
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+from app.config.auth_config import supabase_client as supabase
+from app.utils.common_utils import validate_data_presence
+
+from app.dependencies.auth import get_current_user_optional, get_current_user_required
+
+router = APIRouter()
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+logger = logging.getLogger(__name__)
+# directory=os.path.join(BASE_DIR, "static")
+
+# print(f"BASE_DIR: {BASE_DIR}")
+# print(f"Static files directory: {directory}")
+# router.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+
+def static_file_url(filename: str) -> str:
+    return f"/static/{filename}"
+
+# Configure templates directory
+templates = Jinja2Templates(directory="app/templates")
+templates.env.globals['static_file_url'] = static_file_url
+
+
+
+# Inject header variant
+def inject_common_context(request: Request, user: dict = None, dev_mode: bool = False):
+    return {
+        "request": request,
+        "user": user,
+        "dev_mode": dev_mode,
+        "header_template": "components/header_logged_in.html" if user else "components/header_logged_out.html"
+    }
+
+# --------------------
+# Public Page
+# --------------------
+@router.get("/", response_class=HTMLResponse)
+async def homepage(request: Request, user: dict = Depends(get_current_user_optional)):
+    return templates.TemplateResponse("home.html", {
+        "request": request,
+        "user": user,
+    })
+
+
+@router.get("/shop", response_class=HTMLResponse)
+async def shop_page(request: Request, user: dict = Depends(get_current_user_required)):
+    context = inject_common_context(request, user)
+    context["products"] = [
+        {"id": 1, "name": "Purpose Report"},
+        {"id": 2, "name": "Career Report"}
+    ]
+    return templates.TemplateResponse("shop.html", context)
+
+# --------------------
+# Questionnaire Page (logged in)
+# --------------------
+@router.get("/questionnaire/{product_id}", response_class=HTMLResponse)
+async def questionnaire_page(
+    product_id: int,
+    request: Request,
+    user: dict = Depends(get_current_user_required)
+):
+    questions = [
+        {"id": 1, "text": "What motivates you?"},
+        {"id": 2, "text": "How do you handle failure?"}
+    ]
+    context = inject_common_context(request, user)
+    context["questions"] = questions
+    context["product_id"] = product_id
+    return templates.TemplateResponse("questionnaire.html", context)
+
+# --------------------
+# Post-purchase: Success / Cancel / Error
+# --------------------
+@router.get("/purchase/{status}", response_class=HTMLResponse)
+async def purchase_status_page(
+    status: str,
+    request: Request,
+    user: dict = Depends(get_current_user_required)
+):
+    if status not in ["success", "cancel", "error"]:
+        raise HTTPException(status_code=404, detail="Page not found")
+
+    context = inject_common_context(request, user)
+    return templates.TemplateResponse(f"{status}.html", context)
+
+# --------------------
+# Generated Report Page (logged in)
+# --------------------
+@router.get("/report/{report_id}", response_class=HTMLResponse)
+async def report_page(
+    report_id: str,
+    request: Request,
+    user: dict = Depends(get_current_user_required)
+):
+    report = {
+        "title": "Your Purpose Report",
+        "content": "You are driven by..."
+    }
+    context = inject_common_context(request, user)
+    context["report"] = report
+    return templates.TemplateResponse("report.html", context)
+
+# --------------------
+# Account Page (logged in) ### IF THE USER IS NOT LOGGED IN, REDIRECT TO SIGN-IN PAGE...
+# --------------------
+@router.get("/account", response_class=HTMLResponse)
+async def account_page(
+    request: Request,
+    user: dict = Depends(get_current_user_required)
+):
+    ### DEV ###
+    dev_mode = True
+    ### DEV ###
+    
+    credits = 3
+    purchases = [
+        {"id": 1, "name": "Purpose Report", "date": "2024-11-10"}
+    ]
+    context = inject_common_context(request, user, dev_mode)
+    context.update({"credits": credits, "purchases": purchases})
+    return templates.TemplateResponse("account.html", context)
+
+
+
+# --------------------
+# Product pages
+# --------------------
+
+@router.get("/product/{token_id}", response_class=HTMLResponse)
+async def open_product_token_page(
+    request: Request,
+    token_id: str,
+    user: dict = Depends(get_current_user_required)
+):
+    try:
+        # Fetch access token and validate ownership
+        token_res = supabase.table("report_access_tokens") \
+            .select("*") \
+            .eq("access_token", token_id) \
+            .eq("user_id", str(user["id"])) \
+            .single() \
+            .execute()
+
+        if not validate_data_presence(token_res):
+            return RedirectResponse(url="/account")
+
+        token = token_res.data
+        logger.info(f"Token data: {token}")
+        report_type_id = token["report_type_id"]
+
+        # Create or retrieve input session
+        session_res = supabase.table("report_input_sessions") \
+            .select("*") \
+            .eq("user_id", str(user["id"])) \
+            .eq("report_type_id", str(report_type_id)) \
+            .order("created_at", desc=True) \
+            .limit(1) \
+            .execute()
+            
+            
+        # If session exists, use it; otherwise, create a new one
+        if session_res.data:
+            input_session = session_res.data[0]
+            if token["first_open"]:
+                supabase.table("report_access_tokens") \
+                    .update({"first_open": False}) \
+                    .eq("id", token["id"]) \
+                    .execute()
+            
+        else:
+            create_res = supabase.table("report_input_sessions").insert({
+                "user_id": str(user["id"]),
+                "report_type_id": str(report_type_id)
+            }).execute()
+            input_session = create_res.data[0]
+            supabase.table("report_access_tokens") \
+                .update({"status": "in progress"}) \
+                .eq("id", token["id"]) \
+                .execute()
+
+        # Get questions
+        questions_res = supabase.table("questions") \
+            .select("id, question_title, question_text, is_required") \
+            .eq("report_type_id", str(report_type_id)) \
+            .order("question_order", desc=False) \
+            .execute()
+
+        context = inject_common_context(request, user, dev_mode=True)
+        context.update({
+            "questions": questions_res.data,
+            "session_id": input_session["id"],
+            "token_id": token_id,
+            "report_type_id": report_type_id,
+            "first_open": token["first_open"]
+        })
+        return templates.TemplateResponse("product.html", context)
+
+    except Exception as e:
+        logger.error(f"Error opening product page for token {token_id}: {e}")
+        return RedirectResponse(url="/account")
+
+
+
+
+
+# --------------------
+# utility Pages
+# --------------------
+@router.get("/success", response_class=HTMLResponse)
+async def success_page(request: Request, user: dict = Depends(get_current_user_optional)):
+    if not user:
+        return RedirectResponse("/sign-in")
+    context = inject_common_context(request, user)
+    return templates.TemplateResponse("success.html", context)
+
+@router.get("/cancel", response_class=HTMLResponse)
+async def cancel_page(request: Request, user: dict = Depends(get_current_user_optional)):
+    if not user:
+        return RedirectResponse("/sign-in")
+    context = inject_common_context(request, user)
+    return templates.TemplateResponse("cancel.html", context)
+
+@router.get("/refund", response_class=HTMLResponse)
+async def cancel_page(request: Request, user: dict = Depends(get_current_user_optional)):
+    context = inject_common_context(request, user)
+    return templates.TemplateResponse("refund_policy.html", context)
+
+@router.get("/terms-of-service", response_class=HTMLResponse)
+async def cancel_page(request: Request, user: dict = Depends(get_current_user_optional)):
+    context = inject_common_context(request, user)
+    return templates.TemplateResponse("terms_of_service.html", context)
+
+
+
+# --------------------
+# Auth Pages
+# --------------------
+
+@router.get("/sign-in", response_class=HTMLResponse)
+async def sign_in_get(request: Request, user: dict = Depends(get_current_user_optional)):
+    if user:
+        return RedirectResponse("/account/")
+    context = inject_common_context(request)
+    return templates.TemplateResponse("user_signin.html", context)
+
+@router.get("/finish-sign-up", response_class=HTMLResponse)
+async def auth_sign_in(request: Request, user: dict = Depends(get_current_user_optional)):
+    '''Displays the magic-link sign-in page for Habit Hero users. Checks if the user is logged in and passes the status to the template.
+
+        Request Type: GET
+        Response Class: HTMLResponse
+        Path: /auth-sign-in
+        Purpose: Display the sign-in page for Habit Hero users using a magic link.
+        Dependencies: user_info from get_user_auth_status
+    '''
+    context = inject_common_context(request, user)
+    return templates.TemplateResponse("_user_access.html", context)
+
+
+
+@router.get("/sign-up", response_class=HTMLResponse)
+async def sign_up_get(request: Request, user: dict = Depends(get_current_user_optional)):
+    if user:
+        return RedirectResponse("/account/")
+    context = inject_common_context(request)
+    return templates.TemplateResponse("user_register.html", context)
+
+
+@router.get("/recovery", response_class=HTMLResponse)
+async def recovery_get(request: Request):
+    context = inject_common_context(request)
+    return templates.TemplateResponse("user_password_rec_request.html", context)
+
+
+@router.get("/password-reset", response_class=HTMLResponse)
+async def password_reset(request: Request, user: dict = Depends(get_current_user_optional)):
+    context = inject_common_context(request, user)
+    return templates.TemplateResponse("user_password_reset.html", context)
