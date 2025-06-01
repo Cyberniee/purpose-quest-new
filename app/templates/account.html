@@ -187,9 +187,12 @@
                     startProduct(tokenId);
                 });
 
-                if (valid && taskId && status === 'processing') {
+                if (valid && (status === 'generating' || status === 'processing')) {
                     getTaskStatus(tokenId);
+                    card.classList.add("disabled-card");
+
                 }
+
             });
 
             // Attach purchase behavior
@@ -246,21 +249,34 @@
         }
 
         function getCardActionButton(product, type) {
+            const status = product.status || '';
+
             if (type === 'valid') {
-                const status = product.status || '';
-                const buttonText = status === 'done' ? 'Done' : status === 'processing' ? 'Processing...' : 'Start';
-                const disabled = (status === 'done' || status === 'processing') ? 'disabled' : '';
-                return `<button class="btn btn-primary start-btn mt-auto" ${disabled}
+                if (status === 'done') {
+                    return `<a class="btn btn-primary mt-auto" 
+                        href="/report/${product.token_id}" 
+                        role="button">View Report</a>`;
+                }
+
+                if (status === 'generating' || status === 'processing') {
+                    return `<button class="btn btn-secondary mt-auto" disabled>Generating...</button>`;
+                }
+
+                return `<button class="btn btn-primary start-btn mt-auto"
                     data-product-id="${product.product_id}" 
                     data-token-id="${product.token_id}">
-                    ${buttonText}
+                    Start
                 </button>`;
-            } else if (type === 'invalid') {
-                const buttonText = product.status === 'done' ? 'Open Report' : 'Generating...';
+            }
+
+            if (type === 'invalid') {
+                const label = product.status === 'done' ? 'Open Report' : 'Generating...';
                 return `<a class="btn btn-primary mt-auto" 
-                    href="${product.report_link}" 
-                    role="button">${buttonText}</a>`;
-            } else if (type === 'available') {
+                    href="/report/${product.report_id || product.token_id}" 
+                    role="button">${label}</a>`;
+            }
+
+            if (type === 'available') {
                 return `<button class="btn btn-primary buy-btn mt-auto" 
                     data-product-id="${product.product_id}"
                     data-product-name="${product.name}" 
@@ -269,8 +285,10 @@
                     Buy for €${product.price}
                 </button>`;
             }
+
             return '';
         }
+
 
         function generateStatusBadge(product) {
             const status = product.status || '';

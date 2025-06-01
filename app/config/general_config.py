@@ -25,6 +25,10 @@ class SupabaseSettings:
 @dataclass
 class OpenAISettings:
     api_key: str = os.getenv("OPENAI_API_KEY", "")
+    model: str = os.getenv("OPENAI_MODEL", "gpt-4o")
+    temperature: float = float(os.getenv("OPENAI_TEMPERATURE", 0.3))
+    frequency_penalty: float = float(os.getenv("OPENAI_FREQUENCY_PENALTY", 0.99))
+    presence_penalty: float = float(os.getenv("OPENAI_PRESENCE_PENALTY", 0.99))
 
 @dataclass
 class StripeSettings:

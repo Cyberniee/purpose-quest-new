@@ -124,6 +124,11 @@ h3 {
   object-position: center;
 }
 
+.disabled-card {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
 .form-signin {
     width: 100%;
     max-width: 330px;

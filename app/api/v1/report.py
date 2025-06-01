@@ -115,6 +115,9 @@ async def trigger_report_generation(request: GenerationRequest, user=Depends(Aut
     }).execute()
 
     report_id = report_res.data[0]["id"]
+    
+    # Update token with report ID
+    answers_res = supabase.table("report_access_tokens").update({"report_id":report_id}).eq("id", token['id']).execute()
 
     # 4. Fetch answers
     answers_res = supabase.table("user_answers").select("question_id, answer_text, questions(question_text)").eq("input_session_id", session_id).execute()

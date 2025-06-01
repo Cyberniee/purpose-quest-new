@@ -2,8 +2,12 @@
 
 from app.celery_worker import celery_app
 from app.config.auth_config import supabase_client as supabase
-from app.core.ai_client import openai
+from app.core.ai_client import get_openai_client
+from app.config import config
 import logging
+
+openai = get_openai_client()
+
 
 @celery_app.task
 def generate_report_chapter(chapter_data):
@@ -25,9 +29,12 @@ def generate_report_chapter(chapter_data):
 
         
         # Generate chapter content using OpenAI API
-        ai_response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": final_prompt}]
+        ai_response = openai.chat.completions.create(
+            model=config.openai.model,
+            messages=[{"role": "user", "content": final_prompt}],
+            temperature=config.openai.temperature,
+            frequency_penalty=config.openai.frequency_penalty,
+            presence_penalty=config.openai.presence_penalty,
         )
 
         content = ai_response.choices[0].message.content.strip()
@@ -35,7 +42,6 @@ def generate_report_chapter(chapter_data):
 
         supabase.table("report_chapters").insert({
             "report_id": report_id,
-            "report_type_id": report_type_id,
             "chapter_id": chapter_id,
             "chapter_prompt_id": chapter_prompt_id,
             "order_index": order_index,
