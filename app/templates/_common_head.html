@@ -68,3 +68,31 @@
     document.head.appendChild(link);
 })();
 </script>
+
+<script type="module">
+    async function keepSessionAlive() {
+        try {
+            const res = await fetch('/auth/refresh_session', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            const data = await res.json();
+            console.log("[Session] Refreshed:", data);
+        } catch (e) {
+            console.warn("[Session] Refresh failed:", e);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const userElement = document.getElementById("user-id");
+        const userId = userElement?.getAttribute("data-user-id");
+
+        if (userId) {
+            console.log("[Session] User detected, enabling keep-alive polling.");
+            setInterval(keepSessionAlive, 10 * 60 * 1000); // every 10 minutes
+            keepSessionAlive(); // initial call
+        } else {
+            console.log("[Session] No user detected, skipping polling.");
+        }
+    });
+</script>

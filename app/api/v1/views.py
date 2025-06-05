@@ -93,22 +93,6 @@ async def purchase_status_page(
     context = inject_common_context(request, user)
     return templates.TemplateResponse(f"{status}.html", context)
 
-# --------------------
-# Generated Report Page (logged in)
-# --------------------
-@router.get("/report/{report_id}", response_class=HTMLResponse)
-async def report_page(
-    report_id: str,
-    request: Request,
-    user: dict = Depends(get_current_user_required)
-):
-    report = {
-        "title": "Your Purpose Report",
-        "content": "You are driven by..."
-    }
-    context = inject_common_context(request, user)
-    context["report"] = report
-    return templates.TemplateResponse("report.html", context)
 
 # --------------------
 # Account Page (logged in) ### IF THE USER IS NOT LOGGED IN, REDIRECT TO SIGN-IN PAGE...
@@ -123,13 +107,9 @@ async def account_page(
     ### DEV ###
     if not user:
         return RedirectResponse(url="/sign-in")
-    
-    credits = 3
-    purchases = [
-        {"id": 1, "name": "Purpose Report", "date": "2024-11-10"}
-    ]
+
     context = inject_common_context(request, user, dev_mode)
-    context.update({"credits": credits, "purchases": purchases})
+
     return templates.TemplateResponse("account.html", context)
 
 
@@ -158,6 +138,10 @@ async def open_product_token_page(
 
         token = token_res.data
         logger.info(f"Token data: {token}")
+        
+        if token["status"] == "done":
+            return RedirectResponse(f"/report/{token['report_id']}")
+
         report_type_id = token["report_type_id"]
 
         # Create or retrieve input session
@@ -165,9 +149,11 @@ async def open_product_token_page(
             .select("*") \
             .eq("user_id", str(user["id"])) \
             .eq("report_type_id", str(report_type_id)) \
+            .eq("report_access_token_id", token["id"]) \
             .order("created_at", desc=True) \
             .limit(1) \
             .execute()
+
             
             
         # If session exists, use it; otherwise, create a new one
@@ -191,7 +177,8 @@ async def open_product_token_page(
         else:
             create_res = supabase.table("report_input_sessions").insert({
                 "user_id": str(user["id"]),
-                "report_type_id": str(report_type_id)
+                "report_type_id": str(report_type_id),
+                "report_access_token_id": token["id"],
             }).execute()
             
             input_session = create_res.data[0]
@@ -221,6 +208,22 @@ async def open_product_token_page(
         logger.error(f"Error opening product page for token {token_id}: {e}")
         return RedirectResponse(url="/account")
 
+@router.get("/report/{report_id}", response_class=HTMLResponse)
+async def report_page(request: Request, report_id: str, user: dict = Depends(get_current_user_required)):
+    report = supabase.table("reports").select("*, report_input_sessions(user_id)").eq("id", report_id).eq("report_input_sessions.user_id", user["id"]).single().execute()
+    if not report.data:
+        raise HTTPException(404, detail="Report not found")
+
+    # Fetch chapters
+    chapters = supabase.table("report_chapters").select("content, order_index, chapters(title)").eq("report_id", report_id).order("order_index").execute()
+
+    context = inject_common_context(request, user, dev_mode=True)
+    context.update({
+        "report": report.data,
+        "chapters": chapters.data
+    })
+
+    return templates.TemplateResponse("pq_report.html", context)
 
 
 

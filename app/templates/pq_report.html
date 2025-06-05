@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Purpose Quest Report</title>
+  {% include '_common_head.html' %}
+<link rel="stylesheet" href='/static/productStyle.css'>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  {% include 'header.html' %}
+
+  <main class="container my-5 flex-grow-1">
+    <section class="py-2">
+      <div class="container">
+        <div class="row">
+          <h3 class="w-100 text-center">Introduction</h3>
+          <div class="promo pe-md-3 pe-lg-5 text-center">
+            <p>
+              Welcome to your personalized evaluation report! This report is designed to help you
+              understand the sources of meaning and purpose in your life based on your story. It is
+              inspired by the principles of Logotherapy, which focuses on finding meaning through
+              personal experiences, relationships, and values.
+            </p>
+            <p>You can use this report as a guide for self-reflection and exploration.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="report-container"></div>
+
+    <div id="report-data" data-report='{{ chapters | tojson }}'></div>
+  </main>
+
+  {% include 'account_footer.html' %}
+
+  <script>
+    const container = document.getElementById('report-container');
+    const rawData = document.getElementById('report-data').getAttribute('data-report');
+    const chapters = JSON.parse(rawData);
+
+    function formatContent(content) {
+      if (!content) return "";
+
+      return content
+        .replace(/### (.*?)(\n|$)/g, '<h3>$1</h3>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/^- (.*?)(\n|$)/gm, '<li>$1</li>') // bullet
+        .replace(/(?:<li>.*?<\/li>)+/gs, match => `<ul>${match}</ul>`)
+        .replace(/\n/g, '<br>');
+    }
+
+    function renderChapter(chapter, index) {
+      const imageUrl = `/static/images/purpose-quest-${index + 1}.png`;
+      const chapterTitle = chapter.chapters?.title || `Chapter ${index + 1}`;
+      const content = formatContent(chapter.content || "");
+
+      const imageHtml = `
+        <div class="col-12 col-md-5 align-self-center">
+          <div class="product-cover-holder text-center">
+            <img class="img-fluid rounded report-img product-cover" src="${imageUrl}" alt="${chapterTitle}">
+          </div>
+        </div>`;
+
+      const textHtml = `
+        <div class="col-12 col-md-7 align-self-center">
+          <div class="promo pe-md-3 pe-lg-5">
+            <h2 class="mb-3">${chapterTitle}</h2>
+            ${content}
+          </div>
+        </div>`;
+
+      const layout = index % 2 === 0 ? `${imageHtml}${textHtml}` : `${textHtml}${imageHtml}`;
+
+      return `
+        <section class="py-2">
+          <div class="container">
+            <div class="row my-5">
+              ${layout}
+            </div>
+          </div>
+        </section>`;
+    }
+
+    chapters.sort((a, b) => a.order_index - b.order_index);
+    const fullHtml = chapters.map((c, i) => renderChapter(c, i)).join('');
+    container.innerHTML = fullHtml;
+  </script>
+</body>
+</html>

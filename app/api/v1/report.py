@@ -7,7 +7,7 @@ from uuid import UUID
 
 from app.utils.common_utils import validate_data_presence
 from app.config.auth_config import supabase_client as supabase
-from app.modules.tasks.report_generation import generate_report_chapter
+from app.modules.tasks.report_generation import generate_report_chapter, generate_report_chapter_mock
 from app.modules.services.auth.auth_utils import AuthenticationUtils
 
 logger = logging.getLogger(__name__)
@@ -141,7 +141,21 @@ async def trigger_report_generation(request: GenerationRequest, user=Depends(Aut
         prompt = prompt_res.data[0]
 
         # 6. Dispatch task
-        generate_report_chapter.apply_async(
+        '''generate_report_chapter.apply_async(
+            args=[{
+                "session_id": session_id,
+                "report_id": report_id,
+                "report_type_id": report_type_id,
+                "chapter_id": chapter["id"],
+                "chapter_prompt_id": prompt["id"],
+                "order_index": chapter["order_index"],
+                "prompt": prompt["prompt_text"],
+                "user_answers": user_answers
+            }],
+            queue="reports"
+        )'''
+
+        generate_report_chapter_mock.apply_async(
             args=[{
                 "session_id": session_id,
                 "report_id": report_id,
@@ -182,5 +196,6 @@ async def get_report_progress(token_id: str, user=Depends(AuthenticationUtils.ge
     return {
         "progress": report_res.data["progress"],
         "total": total_chapters,
-        "status": report_res.data["status"]
+        "status": report_res.data["status"],
+        "report_id": report_id
     }

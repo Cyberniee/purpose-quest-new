@@ -1,4 +1,4 @@
-import json
+import json, urllib.parse
 
 def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
     """
@@ -32,12 +32,12 @@ def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
         },
         {
             "key": "user_data",
-            "value": json.dumps({
+            "value": urllib.parse.quote(json.dumps({
                 "user_id": user.get("id"),
                 "email": user.get("email"),
                 "name": user.get("name", ""),
                 "first_login": user.get("first_login", False)
-            }),
+            })),
             "httponly": False,  # Required for frontend access
             "secure": True,
             "path": "/",

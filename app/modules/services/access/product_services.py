@@ -51,6 +51,7 @@ async def fetch_purchased_tokens_with_metadata(user_id: str, stripe_products: li
                 **stripe_info,  # includes name, image, description, price, etc.
                 "status": token.get("status", "available"),
                 "token_id": token["access_token"],
+                "report_id": token["report_id"],
                 "report_type_id": report_type_id,
                 "date": token["granted_at"],
                 "valid": True,

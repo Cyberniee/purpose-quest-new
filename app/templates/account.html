@@ -77,7 +77,6 @@
     </div>
     {% include 'account_footer.html' %}
 
-    <div id="user-id" data-user-id="{{ user_id }}"></div> <!-- Unsure if this is still relevant in our new setup -->
     <div id="report-links" data-report-id="{{ report_links }}"></div>
     <!-- Unsure if this is still relevant in our new setup -->
 
@@ -94,7 +93,7 @@
             const userId = userIdElement?.getAttribute('data-user-id');
 
             showFlashToast();
-            checkNewUser(userId);
+            // checkNewUser(userId);
 
             const productContainer = document.getElementById('products-container');
             const reportContainer = document.getElementById('reports-container');
@@ -104,10 +103,8 @@
             // ✅ Attach sync button handler early
             const syncBtn = document.getElementById('sync-stripe-btn');
             if (syncBtn) {
-                console.log('Sync button found, attaching handler');
 
                 syncBtn.addEventListener('click', async () => {
-                    console.log('Sync button clicked');
                     syncBtn.disabled = true;
                     syncBtn.innerText = 'Syncing...';
 
@@ -138,11 +135,14 @@
                 const response = await fetch('/account/products');
                 const data = await response.json();
 
-                populateProductCards(data.valid_products, productContainer, 'valid');
-                populateProductCards(data.invalid_products, reportContainer, 'invalid');
+                const notStarted = data.valid_products.filter(p => ["not started", "in progress", ""].includes(p.status));
+                const generatingOrDone = data.valid_products.filter(p => ["generating", "processing", "done"].includes(p.status));
+
+
+                populateProductCards(notStarted, productContainer, 'valid');
+                populateProductCards(generatingOrDone, reportContainer, 'valid');
                 populateProductCards(data.available_products, availableContainer, 'available');
                 populatePastPurchases([...data.valid_products, ...data.invalid_products], purchasesContainer);
-
                 attachProductBehaviors(data.valid_products, data.available_products);
 
             } catch (err) {
@@ -165,6 +165,7 @@
 
         function attachProductBehaviors(validProducts = [], availableProducts = []) {
             const startButtons = document.querySelectorAll('.start-btn');
+            const reportButtons = document.querySelectorAll('.report-btn');
             const buyButtons = document.querySelectorAll('.buy-btn');
             const btns = document.querySelectorAll('.btn-primary');
 
@@ -173,27 +174,28 @@
             // Attach start behavior
             startButtons.forEach(button => {
                 const card = button.closest('.valid-product-card');
-                const status = card?.querySelector('.token-status-label')?.getAttribute('data-status');
-                const taskId = card?.querySelector('.progress-container')?.getAttribute('data-task-id');
+                const status = card?.querySelector('.token-status-label')?.getAttribute('data-status')?.toLowerCase() || '';
                 const tokenId = card?.getAttribute('data-token-id');
-                const valid = card?.querySelector('.token-status-label')?.getAttribute('data-valid') === 'True';
-
-                if (status === 'processing' || status === 'done') {
-                    button.disabled = true;
-                    button.innerText = status === 'processing' ? 'Processing...' : 'Done';
-                }
+                const valid = card?.querySelector('.token-status-label')?.getAttribute('data-valid') === 'true';
 
                 button.addEventListener('click', () => {
                     startProduct(tokenId);
                 });
+            });
+
+            // Handle "Generating..." report buttons
+            reportButtons.forEach(button => {
+                const card = button.closest('.valid-product-card');
+                const status = card?.querySelector('.token-status-label')?.getAttribute('data-status')?.toLowerCase() || '';
+                const tokenId = card?.getAttribute('data-token-id');
+                const valid = card?.querySelector('.token-status-label')?.getAttribute('data-valid') === 'true';
 
                 if (valid && (status === 'generating' || status === 'processing')) {
-                    getTaskStatus(tokenId);
+                    getTaskStatus(tokenId, card);
                     card.classList.add("disabled-card");
-
                 }
-
             });
+
 
             // Attach purchase behavior
             buyButtons.forEach(button => {
@@ -202,7 +204,7 @@
                     const productName = button.getAttribute('data-product-name');
                     const productPrice = button.getAttribute('data-product-price');
                     const productPriceId = button.getAttribute('data-product-price-id');
-                    handlePurchase(productId, productName, productPrice, productPriceId, productSlug, stripe);
+                    handlePurchase(productId, productName, productPrice, productPriceId, stripe);
                 });
             });
         }
@@ -225,25 +227,33 @@
                     <div class="card product-card ${type}-product-card d-flex flex-column" 
                         data-token-id="${product.token_id}" 
                         data-product-id="${product.product_id}">
+
                         <div class="image-badge-container">
                             <img class="card-img-top image-max-h" src="${product.image}" alt="${product.name}" loading="lazy">
                             ${generateStatusBadge(product)}
                         </div>
+
                         <div class="card-body d-flex flex-column flex-grow-1">
                             <h5 class="card-title">${product.name}</h5>
                             <p class="card-text">${product.description}</p>
-                            ${getCardActionButton(product, type)}
-                        </div>
-                    </div>
-                    <div class="progress mt-2" style="height: 20px;">
-                        <div class="progress-bar" role="progressbar"
-                            style="width: 0%;" 
-                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                            0%
-                        </div>
-                    </div>
 
+                            <!-- ✅ Progress section -->
+                            <div class="progress-container pb-3" style="display:none;" 
+                                data-product-id="${product.product_id}" 
+                                data-task-id="${product.token_id}">
+                                <div class="progress-label" data-product-id="${product.product_id}"></div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" 
+                                        data-product-id="${product.product_id}" style="width: 0%;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${getCardActionButton(product, type)}
+                        </div> <!-- end .card-body -->
+                    </div> <!-- end .card -->
                 `;
+
                 container.appendChild(card);
             });
         }
@@ -254,12 +264,12 @@
             if (type === 'valid') {
                 if (status === 'done') {
                     return `<a class="btn btn-primary mt-auto" 
-                        href="/report/${product.token_id}" 
+                        href="/report/${product.report_id}" 
                         role="button">View Report</a>`;
                 }
 
                 if (status === 'generating' || status === 'processing') {
-                    return `<button class="btn btn-secondary mt-auto" disabled>Generating...</button>`;
+                    return `<button class="btn btn-secondary report-btn mt-auto" disabled data-product-id="${product.product_id}" data-token-id="${product.token_id}" >Generating...</button>`;
                 }
 
                 return `<button class="btn btn-primary start-btn mt-auto"
@@ -289,7 +299,6 @@
             return '';
         }
 
-
         function generateStatusBadge(product) {
             const status = product.status || '';
             let badgeClass = 'bg-secondary';
@@ -306,9 +315,9 @@
             } else if (status === 'done') {
                 badgeClass = 'bg-success';
                 label = 'Done';
-            } else if (status === 'processing') {
+            } else if (status === 'generating') {
                 badgeClass = 'bg-success';
-                label = 'Processing...';
+                label = 'Generating...';
             }
             return `<span class="token-status-label badge ${badgeClass}" 
                 data-status="${status}" 

@@ -22,7 +22,6 @@ async def create_checkout_session(request: Request, user: dict = Depends(get_cur
     product_price_id = data.get('product_price_id')
     product_name = data.get('product_name')
     product_price = data.get('product_price')
-    product_slug = data.get('product_slug')
 
     if not all([product_id_stripe, product_price_id, user_id]):
         raise HTTPException(status_code=400, detail="Missing parameters")
@@ -40,7 +39,6 @@ async def create_checkout_session(request: Request, user: dict = Depends(get_cur
             metadata={
                 "report_type_id": product_id_stripe,
                 "user_id": user_id,
-                "product_slug": product_slug,
                 "product_name": product_name,
                 "product_price": product_price
             }

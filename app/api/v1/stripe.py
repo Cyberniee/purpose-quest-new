@@ -73,7 +73,7 @@ async def stripe_webhook_handler(request: Request, stripe_signature: str = Heade
                 "access_token": access_token,
                 "granted_by": "stripe",
                 "payment_reference": payment_id,
-                "status": "not_started"
+                "status": "not started"
             }).execute()
 
 

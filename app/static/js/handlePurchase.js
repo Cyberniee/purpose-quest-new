@@ -1,12 +1,12 @@
-export function handlePurchase(productId, productName, productPrice, productPriceId, productSlug, stripe) {
+export function handlePurchase(productId, productName, productPrice, productPriceId, stripe) {
     // Create a checkout session with the product ID
-    console.log("sending this to the api:", productId, productName, productPrice, productPriceId, productSlug)
+    console.log("sending this to the api:", productId, productName, productPrice, productPriceId, stripe)
     fetch('/payments/create_checkout_session', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ product_id_stripe: productId, product_name: productName, product_price: productPrice, product_price_id: productPriceId, product_slug: productSlug }),
+        body: JSON.stringify({ product_id_stripe: productId, product_name: productName, product_price: productPrice, product_price_id: productPriceId }),
     })
         .then(function (response) {
             return response.json();

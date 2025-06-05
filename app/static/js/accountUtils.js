@@ -14,32 +14,6 @@ export function formatProductDate(productId, dateStr) {
     document.getElementById("formattedDate-" + productId).textContent = formattedDate;
 }
 
-export async function getTaskStatus(tokenId) {
-    const interval = setInterval(async () => {
-        const res = await fetch(`/report/progress/${tokenId}`);
-        if (!res.ok) return;
-
-        const data = await res.json();
-        const percentage = Math.round((data.progress / data.total) * 100);
-
-        const card = document.querySelector(`[data-token-id="${tokenId}"]`);
-        const bar = card.querySelector('.progress-bar');
-        bar.style.width = `${percentage}%`;
-        bar.setAttribute('aria-valuenow', percentage);
-        bar.innerText = `${percentage}%`;
-
-        if (data.status === "completed") {
-            clearInterval(interval);
-            const button = card.querySelector('.start-btn');
-            button.disabled = false;
-            button.innerText = 'To Report';
-            button.onclick = () => {
-                window.location.href = `/report/${tokenId}`;
-            };
-        }
-    }, 3000);
-}
-
 function addReportToUI(product) {
     const reportsSection = document.querySelector('.reports-section .row');
     const noReportsMessage = reportsSection.querySelector('.no-reports-message');
@@ -84,7 +58,6 @@ function addReportToUI(product) {
     reportLink.classList.add('btn', 'btn-primary', 'start-btn', 'mt-auto');
     reportLink.href = product.report_link;
     reportLink.dataset.productId = product.product_id;
-    reportLink.dataset.productSlug = product.product_slug;
     reportLink.dataset.tokenId = product.token_id;
     reportLink.textContent = 'Open Report';
 
@@ -205,22 +178,33 @@ export function checkNewUser(userId) {
     if (!userCookie) return;
 
     try {
-        const cookieValue = decodeURIComponent(userCookie.split('=')[1]);
-        const userData = JSON.parse(cookieValue);
+        // Extract raw cookie value
+        const rawValue = userCookie.split('=').slice(1).join('=');
+        // Safely decode and sanitize
+        const cleaned = decodeURIComponent(rawValue)
+            .replace(/\\n/g, '\\n')
+            .replace(/\\'/g, "\\'")
+            .replace(/\\"/g, '\\"')
+            .replace(/\\&/g, '\\&')
+            .replace(/\\r/g, '\\r')
+            .replace(/\\t/g, '\\t')
+            .replace(/\\b/g, '\\b')
+            .replace(/\\f/g, '\\f');
+
+        const userData = JSON.parse(cleaned);
 
         if (userData.first_login) {
             const modal = document.getElementById('motivatorModal');
             if (modal) {
                 modal.classList.add('show');
-
-                // Call function to update user status to not new
             }
             updateUserData({ first_login: false });
-        };
+        }
     } catch (err) {
         console.error("Failed to parse user_data cookie:", err);
     }
 }
+
 
 
 export async function updateUserData(updates = {}) {
@@ -247,3 +231,64 @@ export async function updateUserData(updates = {}) {
         return { status: 'error', message: 'Could not update user' };
     }
 }
+
+
+export function getTaskStatus(tokenId, card) {
+    const progressContainer = card.querySelector('.progress-container');
+    const progressBar = progressContainer.querySelector('.progress-bar');
+    const progressLabel = progressContainer.querySelector('.progress-label');
+    const statusLabel = card.querySelector('.token-status-label');
+    const startButton = card.querySelector('.btn');
+
+    async function checkProgress() {
+        try {
+            const res = await fetch(`/report/progress/${tokenId}`);
+            if (!res.ok) throw new Error("Failed to get progress");
+            const data = await res.json();
+
+            const percentage = Math.round((data.progress / data.total) * 100);
+
+            // Show and update the progress bar
+            progressContainer.style.display = 'block';
+            progressBar.style.width = `${percentage}%`;
+            progressBar.setAttribute('aria-valuenow', percentage);
+            progressLabel.innerText = `Progress: ${percentage}%`;
+
+            // Update badge text
+            if (statusLabel) {
+                statusLabel.innerText = 'Processing...';
+                statusLabel.classList.remove('bg-warning', 'bg-primary');
+                statusLabel.classList.add('bg-success');
+            }
+
+            // Show spinner on button
+            if (startButton && startButton.tagName.toLowerCase() === 'button') {
+                startButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...`;
+                startButton.disabled = true;
+            }
+
+            if (data.status === 'completed') {
+                clearInterval(interval);
+                card.classList.remove("disabled-card");
+                progressContainer.style.display = 'none';
+
+                // Replace button with link
+                if (startButton) {
+                    startButton.outerHTML = `<a class="btn btn-primary mt-auto" href="/report/${data.report_id}" role="button">To Report</a>`;
+                }
+
+                if (statusLabel) {
+                    statusLabel.innerText = 'Done';
+                    statusLabel.classList.remove('bg-warning');
+                    statusLabel.classList.add('bg-success');
+                }
+            }
+        } catch (err) {
+            console.error("Progress check error", err);
+        }
+    }
+
+    const interval = setInterval(checkProgress, 8000);
+    checkProgress();
+}
+
