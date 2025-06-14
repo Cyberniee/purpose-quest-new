@@ -123,6 +123,7 @@ async def sign_in(request: Request, response: Response):
             })
         
         user = await get_user_by_supabase_auth_id(decoded_token["sub"])
+        print(f"USER: user data from signin: {user}")
         
         # ✅ Set cookies (still works with fetch if not blocked by CORS)
         response = JSONResponse(status_code=200, content={
@@ -134,7 +135,7 @@ async def sign_in(request: Request, response: Response):
             "access_token": res.session.access_token,
             "refresh_token": res.session.refresh_token,
             "email": email,
-            "user_id": user.get('id', ''),
+            "sub": user.get('sub', ''),
             "name": user.get('name', ''),  # Optional
             "first_login": user.get('first_login', False)  # Optional, default to False
         }):
@@ -163,6 +164,7 @@ async def sign_out(response: Response):
         response.delete_cookie(key="user_id", path="/")
         response.delete_cookie(key="sub", path="/")
         response.delete_cookie(key="user_data", path="/")
+        response.delete_cookie(key="email", path="/")
         return response
     except Exception as e:
         logging.error(f"Sign-out error: {e}")

@@ -2,15 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;900&display=swap');
 
 :root {
-    --color-primary: #000816;
-    --color-secondary: #03588C;
-    --color-link: #0378A6;
-    --color-highlight: #F2E1D8;
-    --color-background: #B5F8FF;
-    --font-primary: 'Poppins', sans-serif !important;
-    --font-primary-weight: 600;
-    --font-secondary: 'Poppins', sans-serif !important;
-    --font-secondary-weight: 300;
-    --font-headers: 'Poppins', sans-serif !important;
-    --font-headers-weight: 900;
+    --bgcolor-gray-100: #fff;
+    --bgcolor-gray-150: #eee;
 }

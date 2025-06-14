@@ -1,0 +1,45 @@
+<!-- app/templates/_side_menu.html -->
+<div class="d-flex flex-column h-100 p-3">
+    <div class="mb-4 d-flex align-items-center">
+        <span class="fs-4 me-2">📖</span>
+        <strong class="fs-5">Digital Journal</strong>
+    </div>
+
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="/dashboard" class="nav-link {% if request.url.path == '/dashboard' %}active{% endif %}"
+                id="nav-dashboard">
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="/journal/today" class="nav-link {% if request.url.path == '/journal/today' %}active{% endif %}"
+                id="nav-journal">
+                Journal
+            </a>
+        </li>
+        <li>
+            <a href="/journal/archive" class="nav-link {% if request.url.path == '/journal/archive' %}active{% endif %}"
+                id="nav-archive">
+                Archive
+            </a>
+        </li>
+        <li>
+            <a href="/assistant" class="nav-link {% if request.url.path.startswith('/assistant') %}active{% endif %}"
+                id="nav-assistant">
+                AI Assistant
+            </a>
+        </li>
+        <li>
+            <a href="/account/settings"
+                class="nav-link {% if request.url.path.startswith('/account/settings') %}active{% endif %}"
+                id="nav-settings">
+                Settings
+            </a>
+        </li>
+    </ul>
+
+    <div class="mt-auto">
+        <a href="/logout" class="d-block text-muted small" id="logout-link">Logout</a>
+    </div>
+</div>

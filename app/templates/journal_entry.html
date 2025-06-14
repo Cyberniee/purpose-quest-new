@@ -1,36 +1,80 @@
+<!-- app/templates/journal_entry.html -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Purpose Quest</title>
-	{% include '_common_head.html' %}
-	<style>
-		#footer-body {
-			background-color: #102132;
-    		color: #ddd !important;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <title>Today's Entry</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include '_common_head.html' %}
+
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
 </head>
 
-<body class="d-flex flex-column min-vh-100">
-	{% include 'header.html' %}
+<body>
 
-	<div class="container">
-        <textarea id="journalEntry" class="form-control" rows="4" placeholder="Write your journal entry here..."></textarea>
-        <button id="saveBtn" class="btn btn-primary">Save</button>
-        <button id="feedbackBtn" class="btn btn-secondary">Feedback</button>
-        <div id="feedbackArea"></div>
-        <!-- Feedback results will be displayed here -->
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+
+            <!-- Sidebar -->
+            <div class="col-12 col-md-3 col-lg-2 bg-light p-0 border-end">
+                {% include '_side_menu.html' %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-12 col-md-9 col-lg-10 p-4">
+
+                <!-- Top Navigation -->
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                    <div>
+                        <a href="/dashboard" class="text-decoration-none" id="back-to-dashboard"
+                            data-label="back-to-dashboard">
+                            ← Back to Dashboard
+                        </a>
+                    </div>
+
+                    <div class="text-center flex-grow-1">
+                        <h3 class="mb-0" id="entry-title">Today's Entry</h3>
+                        <small id="entry-date" data-label="entry-date">Saturday, June 14, 2025</small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary" id="analyze-button" data-label="analyze-button">💡
+                            Analyze</button>
+                        <button class="btn btn-primary" id="save-button" data-label="save-button">💾 Save</button>
+                    </div>
+                </div>
+
+                <!-- Journal Entry Textarea -->
+                <div class="mb-4">
+                    <textarea class="form-control border border-2 product-text-area" rows="12" id="journal-textarea"
+                        data-label="journal-entry" placeholder="Start writing here...">Start writing ... </textarea>
+                </div>
+
+                <!-- Go Deeper Button -->
+                <div class="text-center">
+                    <button class="btn btn-primary" id="ai-reflection-button" data-label="go-deeper-button">
+                        🧠 Go Deeper with AI Reflection
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div id="journal-metadata" data-entry-id="{{ entry_id }}" data-entry-date="{{ entry_date }}"
+        data-entry-date-display="{{ display_date }}"
+        data-entry-content="{{ content | replace('\n', '&#10;') | replace('"', ' &quot;') }}">
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="static/js/journal/interactions.js"></script>
-
-	{% include 'account_footer.html' %}
-
 </body>
+
+<script type="module">
+    import { loadJournalEntryFromDOM } from "/static/js/journal_entry.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadJournalEntryFromDOM();
+    });
+
+</script>
 
 </html>

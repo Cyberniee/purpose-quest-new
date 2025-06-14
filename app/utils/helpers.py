@@ -1,10 +1,14 @@
-import json, urllib.parse
+import json, urllib.parse, logging
+
+logger = logging.getLogger(__name__)
+
 
 def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
     """
     Generate secure cookies for the user session.
     Includes both secure, HttpOnly tokens and frontend-accessible user data.
     """
+    print(f"User in cookie gen: {user}")
     cookies = [
         {
             "key": "access_token",
@@ -12,7 +16,7 @@ def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
             "httponly": True,
             "secure": True,
             "path": "/",
-            "samesite": "Lax"
+            "samesite": "Lax",
         },
         {
             "key": "refresh_token",
@@ -20,29 +24,50 @@ def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
             "httponly": True,
             "secure": True,
             "path": "/",
-            "samesite": "Lax"
+            "samesite": "Lax",
         },
         {
-            "key": "user_id",
-            "value": user.get("id", ""),
+            "key": "email",
+            "value": user.get("email", ""),
             "httponly": True,
             "secure": True,
             "path": "/",
-            "samesite": "Lax"
+            "samesite": "Lax",
+        },
+        {
+            "key": "sub",
+            "value": user.get("sub", ""),
+            "httponly": True,
+            "secure": True,
+            "path": "/",
+            "samesite": "Lax",
         },
         {
             "key": "user_data",
-            "value": urllib.parse.quote(json.dumps({
-                "user_id": user.get("id"),
-                "email": user.get("email"),
-                "name": user.get("name", ""),
-                "first_login": user.get("first_login", False)
-            })),
+            "value": urllib.parse.quote(
+                json.dumps(
+                    {
+                        "sub": user.get("sub"),
+                        "email": user.get("email"),
+                        "name": user.get("name", ""),
+                        "first_login": user.get("first_login", False),
+                    }
+                )
+            ),
             "httponly": False,  # Required for frontend access
             "secure": True,
             "path": "/",
             "max_age": max_age,
-            "samesite": "Lax"
-        }
+            "samesite": "Lax",
+        },
     ]
     return cookies
+
+
+def parse_user_data_cookie(cookie_value: str) -> dict | None:
+    try:
+        decoded = urllib.parse.unquote(cookie_value)
+        return json.loads(decoded)
+    except Exception as e:
+        logger.warning(f"Failed to decode user_data cookie: {e}")
+        return None

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Journal Archive</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include '_common_head.html' %}
+    <!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script> -->
+    <link rel="stylesheet" href="{{ static_file_url('calendar_style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+
+            <!-- Sidebar -->
+            <div class="col-12 col-md-3 col-lg-2 bg-light p-0 border-end">
+                {% include '_side_menu.html' %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-12 col-md-9 col-lg-10 p-4">
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap">
+                    <div>
+                        <h2 class="mb-1" id="archive-title">Journal Archive</h2>
+                        <p class="text-muted" id="archive-subtitle">Explore your past reflections and insights</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary active" id="calendar-view-btn">Calendar View</button>
+                        <button class="btn btn-outline-secondary" id="list-view-btn">List View</button>
+                    </div>
+                </div>
+
+
+                {% include '_archive_calendar.html' %}
+                {% include '_archive_list.html' %}
+            </div>
+        </div>
+
+        <!-- JS Script to render calendar and mock data -->
+        <script type="module">
+            import { initCalendar } from '../static/js/calendar.js';
+
+            const mockJournalEntries = {
+                "2025-06-02": {
+                    date: "Monday, June 2, 2025",
+                    summary: "Reflections on new beginnings and fresh mindset",
+                    excerpt: "Started the month with a clear head. Felt focused and motivated after a long walk...",
+                    wordCount: 285
+                },
+                "2025-06-14": {
+                    date: "Saturday, June 14, 2025",
+                    summary: "Processing mid-month overwhelm",
+                    excerpt: "Feeling a bit lost today. Too many thoughts all at once — journaling helps slow it down...",
+                    wordCount: 317
+                },
+                "2025-06-20": {
+                    date: "Friday, June 20, 2025",
+                    summary: "Breakthrough on personal goals",
+                    excerpt: "Something clicked today. After weeks of circling, I realized I’ve been avoiding something big...",
+                    wordCount: 402
+                }
+            };
+
+            // Convert object to list format once
+            const mockJournalEntriesList = Object.entries(mockJournalEntries).map(([dateKey, entry]) => ({
+                dateKey,
+                dateDisplay: entry.date,
+                summary: entry.summary,
+                excerpt: entry.excerpt,
+                wordCount: entry.wordCount
+            }));
+
+            function loadJournalEntry(dateKey) {
+                const entry = mockJournalEntries[dateKey];
+                const container = document.getElementById("entry-preview-container");
+                const dateTitle = document.getElementById("entry-date-title");
+                const summary = document.getElementById("entry-summary-text");
+                const excerpt = document.getElementById("entry-excerpt-text");
+                const wordCount = document.getElementById("entry-word-count");
+                const viewBtn = document.getElementById("view-entry-btn");
+                const editBtn = document.getElementById("edit-entry-btn");
+
+                if (entry) {
+                    dateTitle.innerText = entry.date;
+                    summary.innerText = entry.summary;
+                    excerpt.innerText = entry.excerpt;
+                    wordCount.innerText = `${entry.wordCount} words`;
+                    viewBtn.href = `/journal/view/${dateKey}`;
+                    editBtn.href = `/journal/edit/${dateKey}`;
+                } else {
+                    dateTitle.innerText = new Date(dateKey).toDateString();
+                    summary.innerText = "";
+                    excerpt.innerText = "No journal entry for this date.";
+                    wordCount.innerText = "";
+                    viewBtn.href = "#";
+                    editBtn.href = "#";
+                }
+
+                container.classList.remove("d-none");
+            }
+
+            function renderListView(entries = []) {
+                const container = document.getElementById("entry-list-container");
+                container.innerHTML = "";
+
+                entries.forEach(entry => {
+                    const card = document.createElement("div");
+                    card.className = "bg-light p-4 rounded mb-4 shadow-sm";
+
+                    card.innerHTML = `
+            <h5 class="mb-1">${entry.dateDisplay}</h5>
+            <p class="text-muted fw-semibold">${entry.summary}</p>
+            <p class="mb-2">${entry.excerpt}</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <small>${entry.wordCount} words</small>
+                <div class="d-flex gap-2">
+                    <a href="/journal/view/${entry.dateKey}" class="btn btn-outline-secondary btn-sm">👁 View</a>
+                    <a href="/journal/edit/${entry.dateKey}" class="btn btn-primary btn-sm">✏️ Edit</a>
+                </div>
+            </div>
+        `;
+
+                    container.appendChild(card);
+                });
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                // Default view is calendar
+                document.getElementById("calendar-container-wrapper").classList.remove("d-none");
+                document.getElementById("archive-list-view").classList.add("d-none");
+
+                initCalendar({
+                    displaySelector: ".display",
+                    daysContainerSelector: ".days",
+                    leftArrowSelector: ".left",
+                    rightArrowSelector: ".right",
+                    selectedOutputSelector: ".selected",
+                    onDateSelect: (dateString) => {
+                        loadJournalEntry(dateString);
+                    },
+                    journalEntryDates: Object.keys(mockJournalEntries)
+                });
+
+                const calendarBtn = document.getElementById("calendar-view-btn");
+                const listBtn = document.getElementById("list-view-btn");
+
+                calendarBtn.addEventListener("click", () => {
+                    document.getElementById("calendar-container-wrapper").classList.remove("d-none");
+                    document.getElementById("archive-list-view").classList.add("d-none");
+                });
+
+                listBtn.addEventListener("click", () => {
+                    document.getElementById("calendar-container-wrapper").classList.add("d-none");
+                    document.getElementById("archive-list-view").classList.remove("d-none");
+                    renderListView(mockJournalEntriesList);
+                });
+            });
+
+        </script>
+
+</body>
+
+</html>

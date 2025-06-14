@@ -1,0 +1,124 @@
+<!-- app/templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% include '_common_head.html' %}
+    <!-- Bootstrap CSS via CDN -->
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <!-- Sidebar -->
+            <div class="col-12 col-md-3 col-lg-2 bg-light p-0 border-end">
+                {% include '_side_menu.html' %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-12 col-md-9 col-lg-10 p-4">
+                <!-- Heading -->
+                <div class="text-center mb-4">
+                    <h2 id="welcome-heading">Welcome back</h2>
+                    <p id="current-date" data-label="current-date">Saturday, June 14, 2025</p>
+                </div>
+
+                <!-- Reflection Prompt Box -->
+                <div class="p-4 bg-light rounded mb-4 text-center" id="reflection-box">
+                    <div class="mb-3">
+                        <div id="reflection-icon" aria-hidden="true">🍂</div> <!-- Placeholder for actual icon -->
+                    </div>
+                    <h5 id="reflection-title" data-label="prompt-title">Ready to reflect?</h5>
+                    <p id="reflection-description" data-label="prompt-description">
+                        Start writing today’s journal entry and let AI help you explore your thoughts deeper.
+                    </p>
+                    <button class="btn btn-primary" id="start-writing-btn" data-label="start-writing-button">
+                        Start Writing
+                    </button>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="row text-center mb-4">
+                    <div class="col-12 col-md-4 mb-3 mb-md-0">
+                        <div class="border rounded p-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Total Entries</span>
+                                <span>📅</span>
+                            </div>
+                            <h4 id="total-entries-count" data-label="total-entries">24</h4>
+                            <small>This month</small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 mb-3 mb-md-0">
+                        <div class="border rounded p-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Streak</span>
+                                <span>📈</span>
+                            </div>
+                            <h4 id="streak-count" data-label="streak-days">7 days</h4>
+                            <small>Keep it up!</small>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="border rounded p-3">
+                            <div class="d-flex justify-content-between">
+                                <span>AI Insights</span>
+                                <span>💬</span>
+                            </div>
+                            <h4 id="ai-insights-count" data-label="ai-insights">12</h4>
+                            <small>This week</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Reflections -->
+                <div class="bg-light rounded p-4 accent-card" id="recent-reflections">
+                    <h5>Recent Reflections</h5>
+                    <p>Your latest journal insights and patterns</p>
+
+                    <div id="today-entry-container"></div>
+
+                </div>
+                {% if dev_mode %}
+                <div class="my-3 text-end">
+                    <button class="btn btn-outline-primary btn-sm" id="generate-mock-entries">Generate 5 Mock
+                        Entries</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script type="module">
+    import { initializeJournalDashboard, setupMockButton  } from "/static/js/dashboard.js";
+
+    document.addEventListener("DOMContentLoaded", function () {
+        initializeJournalDashboard();
+        setupMockButton();
+
+
+
+        const startBtn = document.getElementById("start-writing-btn");
+
+        if (startBtn) {
+            startBtn.addEventListener("click", async function () {
+                try {
+                    window.location.href = "/journal/today";
+                } catch (err) {
+                    console.error("Failed to initiate journal session", err);
+                    alert("Something went wrong. Try again.");
+                }
+            });
+        }
+    });
+</script>
+
+
+</html>

@@ -1,3 +1,9 @@
+:root {
+  --bgcolor-gray-100: #fff;
+  --bgcolor-gray-150: #fafafa;
+  --bgcolor-accent: #fff9f6;
+}
+
 .image-max-h {
     max-height: 550px;
     /* width: 1200px; */
@@ -186,11 +192,16 @@ h3 {
 }
 
 #activitySelector {
-    border-color: #f6f0e3;
+    border-color: aliceblue;
 }
 
 #faq {
     max-width: 48rem;
+}
+
+.light-accent-card {
+    background-color: var(--bgcolor-accent);
+    border-color: transparent!important;
 }
 
 
@@ -206,6 +217,8 @@ h3 {
     overflow-y: hidden;  /* Hide vertical scrollbar */
     resize: none;  /* Prevent manual resize */
 }
+
+
 
 .bodyPurposeQuest {
     display: flex;
@@ -340,183 +353,3 @@ h3 {
       }
 }
 
-
-
-
-/* For now unused
-.pSub {
-    width: 80%;
-}
-
-.hSub {
-    width: 80%;
-}
-
-@media (min-width: 576px) {
-    .container {
-        max-width: 540px;
-    }
-}
-
-@media (min-width: 768px) {
-    .container {
-        max-width: 720px;
-    }
-}
-
-@media (min-width: 992px) {
-    .container {
-        max-width: 960px;
-    }
-}
-
-@media (min-width: 1200px) {
-    .container {
-        max-width: 1140px;
-    }
-}
-
-body {
-    font-family: var(--font-secondary);
-    font-weight: var(--font-secondary-weight);
-    font-size: 16px;
-line-height: 1.5;
-color: #333;
-background-color: #fcfcfc;
-}
-
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: var(--font-headers);
-    font-weight: var(--font-headers-weight);
-    color: #222;
-
-    margin-top: 0;
-
-}
-
-h1 {
-    font-size: 2.5em;
-
-    margin-bottom: 0.5em;
-
-}
-
-h2 {
-    font-size: 2em;
-
-    margin-bottom: 0.75em;
-
-}
-
-
-.subheader {
-    font-family: var(--font-secondary);
-    font-weight: var(--font-secondary-weight);
-    font-size: 1.25em;
-
-    color: #555;
-
-    margin-bottom: 1em;
-
-}
-
-
-@media (max-width: 992px) {
-    h1 {
-        font-size: 2.2em;
-    }
-
-    h2 {
-        font-size: 1.8em;
-    }
-
-    h3 {
-        font-size: 1.6em;
-    }
-}
-
-
-@media (max-width: 768px) {
-    body {
-        font-size: 14px;
-    }
-
-    h1 {
-        font-size: 2em;
-    }
-
-    h2 {
-        font-size: 1.6em;
-    }
-
-    h3 {
-        font-size: 1.4em;
-    }
-}
-
-
-@media (max-width: 576px) {
-    h1 {
-        font-size: 1.8em;
-    }
-
-    h2 {
-        font-size: 1.4em;
-    }
-
-    h3 {
-        font-size: 1.2em;
-    }
-}
-
-#form {
-    width: 80%;
-    align-items: center;
-}
-
-
-.button-container {
-    text-align: center;
-}
-
-.sign-up-button {
-    padding: 15px 30px;
-    border: none;
-    background-color: var(--color-primary);
-    color: #fff;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    display: block;
-margin-left: auto;
-margin-right: auto;
-}
-
-.sign-up-button:hover {
-    background-color: var(--color-secondary);
-}
-
-
-
-.square-image {
-    width: 200px;
-    height: 200px;
-    object-fit: cover;
-    margin: auto;
-}
-
-.token-status-label {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-
-*/

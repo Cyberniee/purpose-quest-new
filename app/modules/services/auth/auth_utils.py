@@ -1,6 +1,7 @@
 # app/modules/services/auth/auth_utils.py
 import logging, json
 import time
+import urllib.parse
 
 from jose import jwt
 from fastapi import HTTPException, Request
@@ -11,6 +12,7 @@ from starlette.responses import JSONResponse
 from app.config.auth_config import AuthSettings
 from app.config.auth_config import supabase_client as supabase
 from app.utils.common_utils import validate_data_presence
+from app.utils.helpers import parse_user_data_cookie
 
 logger = logging.getLogger(__name__)
 
@@ -64,14 +66,10 @@ class AuthenticationUtils:
 
         # ✅ Try cookie if allowed
         if allow_cookie:
-            user_data_cookie = request.cookies.get("user_data")
-            if user_data_cookie:
-                try:
-                    user_data = json.loads(user_data_cookie)
-                    if user_data.get("sub") == auth_user_id:
-                        return user_data
-                except Exception as e:
-                    logger.warning(f"Failed to decode user_data cookie: {e}")
+            raw_cookie = request.cookies.get("user_data")
+            user_data = parse_user_data_cookie(raw_cookie)
+            if user_data and user_data.get("user_id") == auth_user_id:
+                return user_data
 
         # 🧠 Otherwise fetch from Supabase
         user_result = supabase.table("users").select("*").eq("sub", auth_user_id).single().execute()

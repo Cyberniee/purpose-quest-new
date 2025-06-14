@@ -1,0 +1,56 @@
+<div class="row d-none" id="calendar-container-wrapper">
+    <!-- Calendar Panel -->
+    <div class="col-12 col-lg-6 mb-4">
+        <div class="bg-light p-4 rounded">
+            <h5>Select a Date</h5>
+            <p class="text-muted small">Dates with entries are highlighted</p>
+            <div id="calendar-container" data-label="calendar">
+                {% include '_calendar.html'%}
+            </div>
+        </div>
+    </div>
+
+    <!-- Entry Panel -->
+    <!-- RIGHT PANEL – Journal Entry Preview -->
+    <div class="col-12 col-lg-6 mb-4" id="entry-preview-container">
+        <div class="bg-light p-4 rounded h-100 shadow-sm">
+
+            <!-- Date Heading -->
+            <h5 id="entry-date-title" data-label="entry-date-title">
+            </h5>
+
+            <!-- Summary Section -->
+            <div class="p-3 rounded mb-3 border light-accent-card" id="entry-summary-container">
+                <h6 class="fw-bold mb-1">Summary</h6>
+                <p id="entry-summary-text" data-label="entry-summary">
+                </p>
+            </div>
+
+            <!-- Excerpt Section -->
+            <div class=" p-3 rounded mb-3 border" id="entry-excerpt-container">
+                <p class="mb-0" id="entry-excerpt-text" data-label="entry-excerpt">
+                    No entry
+                </p>
+            </div>
+
+            <!-- Word Count + Buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <small id="entry-word-count" data-label="entry-word-count">324 words</small>
+
+                <div class="d-flex gap-2">
+                    <a href="/journal/view/2024-06-07" class="btn btn-outline-secondary btn-sm" id="view-entry-btn"
+                        data-label="view-full-button">
+                        👁 View Full
+                    </a>
+                    <a href="/journal/edit/2024-06-07" class="btn btn-primary btn-sm" id="edit-entry-btn"
+                        data-label="edit-button">
+                        ✏️ Edit
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>

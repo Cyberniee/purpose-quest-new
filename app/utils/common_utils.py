@@ -63,3 +63,16 @@ def calc_tokens(prompt:str):
     token_count = len(tokenizer.encode(prompt))
 
     return token_count
+
+def format_entry_label(date_str: str) -> str:
+    from datetime import datetime, date, timedelta
+    entry_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    today = date.today()
+    delta = (today - entry_date).days
+
+    if delta == 0:
+        return "Today’s Entry"
+    elif delta == 1:
+        return "Yesterday’s Entry"
+    else:
+        return f"{delta} days ago"

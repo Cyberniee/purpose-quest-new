@@ -12,7 +12,7 @@ async def fetch_purchased_tokens_with_metadata(user_id: str, stripe_products: li
         ).eq("user_id", user_id).execute()
 
         if not validate_data_presence(response):
-            logging.info(f"No access tokens for user {user_id}")
+            logging.info(f"No product tokens for user {user_id}")
             return []
 
         access_tokens = response.data

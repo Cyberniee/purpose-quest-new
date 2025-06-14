@@ -9,6 +9,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from app.config.auth_config import supabase_client as supabase
 from app.utils.common_utils import validate_data_presence
+from app.modules.services.journal.journal_services import get_journal_entry_by_id
 
 from app.dependencies.auth import get_current_user_optional, get_current_user_required
 
@@ -111,6 +112,22 @@ async def account_page(
     context = inject_common_context(request, user, dev_mode)
 
     return templates.TemplateResponse("account.html", context)
+
+
+@router.get("/dashboard", response_class=HTMLResponse)
+async def dashboard_page(
+    request: Request,
+    user: dict = Depends(get_current_user_optional)
+):
+    ### DEV ###
+    dev_mode = True
+    ### DEV ###
+    if not user:
+        return RedirectResponse(url="/sign-in")
+
+    context = inject_common_context(request, user, dev_mode)
+
+    return templates.TemplateResponse("dashboard.html", context)
 
 
 
@@ -225,7 +242,64 @@ async def report_page(request: Request, report_id: str, user: dict = Depends(get
 
     return templates.TemplateResponse("pq_report.html", context)
 
+# --------------------
+# Jounraling pages
+# --------------------
 
+@router.get("/journal/today", response_class=HTMLResponse)
+async def entry_page(
+    request: Request,
+    user: dict = Depends(get_current_user_optional)
+):
+    ### DEV ###
+    dev_mode = True
+    ### DEV ###
+    if not user:
+        return RedirectResponse(url="/sign-in")
+
+    context = inject_common_context(request, user, dev_mode)
+
+    return templates.TemplateResponse("journal_entry.html", context)
+
+@router.get("/journal/archive", response_class=HTMLResponse)
+async def archive_page(
+    request: Request,
+    user: dict = Depends(get_current_user_optional)
+):
+    ### DEV ###
+    dev_mode = True
+    ### DEV ###
+    if not user:
+        return RedirectResponse(url="/sign-in")
+
+    context = inject_common_context(request, user, dev_mode)
+
+    return templates.TemplateResponse("archive.html", context)
+
+
+@router.get("/journal/{entry_id}", response_class=HTMLResponse)
+async def open_journal_entry(
+    entry_id: str,
+    request: Request,
+    user=Depends(get_current_user_optional),
+):
+    entry = await get_journal_entry_by_id(entry_id, user["id"])
+    logger.info(f'entry we got: {entry}')
+    if not entry:
+        raise HTTPException(status_code=404, detail="Entry not found")
+
+    entry_date_obj = datetime.strptime(entry["entry_date"], "%Y-%m-%d").date()
+
+    return templates.TemplateResponse(
+        "journal_entry.html",
+        {
+            "request": request,
+            "entry_id": entry["id"],
+            "entry_date": entry["entry_date"],
+            "content": entry["content"],
+            "display_date": entry_date_obj.strftime("%A, %B %d, %Y"),
+        },
+    )
 
 
 # --------------------
