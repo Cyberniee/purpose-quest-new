@@ -108,7 +108,6 @@ async def sign_in(request: Request, response: Response):
     body = await request.json()
     email = body.get("email", "").strip().lower()
     password = body.get("password", "").strip()
-    print(f"Sign-in attempt for email: {email}")
 
     try:
         res = supabase.auth.sign_in_with_password({

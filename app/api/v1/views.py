@@ -294,7 +294,7 @@ async def sign_up_get(request: Request, user: dict = Depends(get_current_user_op
 @router.get("/recovery", response_class=HTMLResponse)
 async def recovery_get(request: Request):
     context = inject_common_context(request)
-    return templates.TemplateResponse("user_password_rec_request.html", context)
+    return templates.TemplateResponse("user_password_reset.html", context)
 
 
 @router.get("/password-reset", response_class=HTMLResponse)
