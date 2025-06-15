@@ -1,7 +1,7 @@
 # app/api/v1/views.py
 import os, logging
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from fastapi import APIRouter, Request, Depends, HTTPException
@@ -32,13 +32,26 @@ templates.env.globals['static_file_url'] = static_file_url
 
 
 # Inject header variant
-def inject_common_context(request: Request, user: dict = None, dev_mode: bool = False):
+def inject_common_context(request, user, dev_mode=False):
+    today_str = date.today().isoformat()
+
+    has_today_entry = False
+    if user:
+        res = supabase.table("journal_entries") \
+            .select("id") \
+            .eq("user_id", user["id"]) \
+            .eq("entry_date", today_str) \
+            .limit(1) \
+            .execute()
+        has_today_entry = bool(res.data)
+
     return {
         "request": request,
         "user": user,
+        "has_today_entry": has_today_entry,
         "dev_mode": dev_mode,
-        "header_template": "components/header_logged_in.html" if user else "components/header_logged_out.html"
     }
+
 
 # --------------------
 # Public Page

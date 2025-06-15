@@ -17,8 +17,9 @@ export async function loadSettings() {
     document.getElementById('security-ai').checked = data.privacy.ai_analysis;
 
     // Appearance
-    document.getElementById(`theme-${data.appearance.theme}`).checked = true;
+    // document.getElementById(`theme-${data.appearance.theme}`).checked = true;
     document.getElementById(`font-${data.appearance.font_size}`).checked = true;
+
 }
 
 export async function saveAllSettings() {

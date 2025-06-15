@@ -37,9 +37,16 @@
                     <p id="reflection-description" data-label="prompt-description">
                         Start writing today’s journal entry and let AI help you explore your thoughts deeper.
                     </p>
-                    <button class="btn btn-primary" id="start-writing-btn" data-label="start-writing-button">
+                    {% if has_today_entry %}
+                    <a href="/journal/{{ today_entry_id }}" class="btn btn-primary" data-label="continue-entry-button">
+                        Continue today’s entry
+                    </a>
+                    {% else %}
+                    <a href="/journal/today" class="btn btn-primary" data-label="start-writing-button">
                         Start Writing
-                    </button>
+                    </a>
+                    {% endif %}
+
                 </div>
 
                 <!-- Stats Row -->
@@ -97,26 +104,11 @@
 </body>
 
 <script type="module">
-    import { initializeJournalDashboard, setupMockButton  } from "/static/js/dashboard.js";
+    import { initializeJournalDashboard, setupMockButton } from "/static/js/dashboard.js";
 
     document.addEventListener("DOMContentLoaded", function () {
         initializeJournalDashboard();
         setupMockButton();
-
-
-
-        const startBtn = document.getElementById("start-writing-btn");
-
-        if (startBtn) {
-            startBtn.addEventListener("click", async function () {
-                try {
-                    window.location.href = "/journal/today";
-                } catch (err) {
-                    console.error("Failed to initiate journal session", err);
-                    alert("Something went wrong. Try again.");
-                }
-            });
-        }
     });
 </script>
 

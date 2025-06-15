@@ -15,7 +15,7 @@
         <li>
             <a href="/journal/today" class="nav-link {% if request.url.path == '/journal/today' %}active{% endif %}"
                 id="nav-journal">
-                New Entry
+                {% if has_today_entry %}Today’s Entry{% else %}New Entry{% endif %}
             </a>
         </li>
         <li>

@@ -58,14 +58,16 @@ async def update_profile(data: dict, current_user=Depends(AuthenticationUtils.ge
 async def update_preferences(data: dict, current_user=Depends(AuthenticationUtils.get_authenticated_user)):
     user_id = current_user["id"]
 
-    notif = data.get("notifications", {})
+    notify = data.get("notifications", {})
     privacy = data.get("privacy", {})
     appearance = data.get("appearance", {})
 
     updates = {
-        "notif_daily": notif.get("daily", False),
-        "notif_ai_insights": notif.get("ai_insights", False),
-        "notif_streaks": notif.get("streaks", False),
+        "first_name": data.get('first_name', ''),
+        "last_name": data.get('last_name', ''),
+        "notif_daily": notify.get("daily", False),
+        "notif_ai_insights": notify.get("ai_insights", False),
+        "notif_streaks": notify.get("streaks", False),
         "encrypt_entries": privacy.get("encrypt", False),
         "ai_analysis": privacy.get("ai_analysis", False),
         "theme": appearance.get("theme", "auto"),
