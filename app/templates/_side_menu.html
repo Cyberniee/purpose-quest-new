@@ -15,24 +15,24 @@
         <li>
             <a href="/journal/today" class="nav-link {% if request.url.path == '/journal/today' %}active{% endif %}"
                 id="nav-journal">
-                Journal
+                New Entry
             </a>
         </li>
         <li>
             <a href="/journal/archive" class="nav-link {% if request.url.path == '/journal/archive' %}active{% endif %}"
                 id="nav-archive">
-                Archive
+                Journal
             </a>
         </li>
-        <li>
+        <!-- <li>
             <a href="/assistant" class="nav-link {% if request.url.path.startswith('/assistant') %}active{% endif %}"
                 id="nav-assistant">
                 AI Assistant
             </a>
-        </li>
+        </li> -->
         <li>
-            <a href="/account/settings"
-                class="nav-link {% if request.url.path.startswith('/account/settings') %}active{% endif %}"
+            <a href="/account-settings"
+                class="nav-link {% if request.url.path.startswith('/account-settings') %}active{% endif %}"
                 id="nav-settings">
                 Settings
             </a>

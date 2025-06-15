@@ -68,7 +68,8 @@ class AuthenticationUtils:
         if allow_cookie:
             raw_cookie = request.cookies.get("user_data")
             user_data = parse_user_data_cookie(raw_cookie)
-            if user_data and user_data.get("user_id") == auth_user_id:
+            if user_data and user_data.get("sub") == auth_user_id:
+                logger.info(f'user_data from cookie: {user_data}')
                 return user_data
 
         # 🧠 Otherwise fetch from Supabase

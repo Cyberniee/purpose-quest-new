@@ -136,6 +136,7 @@ async def sign_in(request: Request, response: Response):
             "refresh_token": res.session.refresh_token,
             "email": email,
             "sub": user.get('sub', ''),
+            "id": user.get('id', ''),
             "name": user.get('name', ''),  # Optional
             "first_login": user.get('first_login', False)  # Optional, default to False
         }):

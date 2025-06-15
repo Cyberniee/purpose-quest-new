@@ -212,7 +212,7 @@ h3 {
 
 .product-text-area {
     height: 100%;
-    max-width: 960px;
+    /* max-width: 960px; */
     /*min-height: 7em!important;*/
     overflow-y: hidden;  /* Hide vertical scrollbar */
     resize: none;  /* Prevent manual resize */

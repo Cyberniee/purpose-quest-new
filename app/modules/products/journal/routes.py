@@ -1,4 +1,6 @@
 # app/modules/products/journal/routes.py
+# /api/journal
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.requests import Request
 from datetime import datetime, date
@@ -13,7 +15,7 @@ from app.modules.services.journal.journal_services import (
 )
 
 router = APIRouter()
-
+logger = logging.getLogger(__name__)
 
 class JournalUpdatePayload(BaseModel):
     content: str
@@ -73,7 +75,9 @@ async def get_recent_journal_entries(
 async def get_all_entry_dates(
     current_user=Depends(AuthenticationUtils.get_authenticated_user)
 ):
+    logger.info("in all_dates")
     user_id = current_user["id"]
+    print(f'user_id at /all_dates: {user_id}')
 
     entries = (
         supabase.table("journal_entries")
@@ -102,7 +106,10 @@ async def get_paginated_journal_entries(
     limit: int = 10,
     current_user=Depends(AuthenticationUtils.get_authenticated_user)
 ):
+    logger.info("in all_dates")
     user_id = current_user["id"]
+    print(f'user_id at /paginated: {user_id}')
+
 
     MAX_LIMIT = 25
     limit = min(limit, MAX_LIMIT)
@@ -122,6 +129,8 @@ async def get_paginated_journal_entries(
         .order("created_at", desc=True) \
         .range(offset, offset + limit - 1) \
         .execute()
+    
+    print(f'data res from /paginated: {data_res}')
 
     entries = []
     for entry in data_res.data or []:

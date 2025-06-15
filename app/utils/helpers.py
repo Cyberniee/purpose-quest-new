@@ -43,6 +43,14 @@ def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
             "samesite": "Lax",
         },
         {
+            "key": "id",
+            "value": user.get("id", ""),
+            "httponly": True,
+            "secure": True,
+            "path": "/",
+            "samesite": "Lax",
+        },
+        {
             "key": "user_data",
             "value": urllib.parse.quote(
                 json.dumps(
@@ -50,6 +58,7 @@ def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
                         "sub": user.get("sub"),
                         "email": user.get("email"),
                         "name": user.get("name", ""),
+                        "id": user.get('id', ''),
                         "first_login": user.get("first_login", False),
                     }
                 )

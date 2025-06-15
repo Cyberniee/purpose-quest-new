@@ -6,21 +6,69 @@ let characterBuffer = "";
 let saveStatusTimeout = null;
 
 
-export function loadJournalEntryFromDOM() {
+export async function loadJournalEntryFromDOM() {
     const textarea = document.getElementById("journal-textarea");
     const entryDateLabel = document.getElementById("entry-date");
     const meta = document.getElementById("journal-metadata");
+    const titleEl = document.getElementById("entry-title");
+    const urlPath = window.location.pathname;
 
-    if (!meta || !textarea) return;
+    if (!textarea || !titleEl) return;
 
-    const entryId = meta.dataset.entryId;
-    const entryDateDisplay = meta.dataset.entryDateDisplay;
-    const content = meta.dataset.entryContent || "";
+    let entryId, entryDate, entryDateDisplay, content;
 
+    if (urlPath === "/journal/today") {
+        // Dynamically fetch or create today's entry
+        try {
+            const res = await fetch("/api/journal/today", { method: "POST" });
+            const data = await res.json();
+
+            entryId = data.id;
+            entryDate = data.entry_date;
+            entryDateDisplay = data.entry_date_display;
+            content = data.content || "";
+        } catch (err) {
+            console.error("Failed to fetch/create today's entry", err);
+            return;
+        }
+    } else {
+        // Fallback to server-injected metadata
+        if (!meta) return;
+
+        entryId = meta.dataset.entryId;
+        entryDate = meta.dataset.entryDate;
+        entryDateDisplay = meta.dataset.entryDateDisplay;
+        content = meta.dataset.entryContent || "";
+    }
+
+    // Populate form
     textarea.disabled = false;
     textarea.value = content;
     lastSavedContent = content;
     textarea.dataset.entryId = entryId;
+
+    // Set title based on entry date
+    const entryDateObj = new Date(entryDate);
+
+    const isSameDate = (d1, d2) => (
+        d1.getFullYear() === d2.getFullYear() &&
+        d1.getMonth() === d2.getMonth() &&
+        d1.getDate() === d2.getDate()
+    );
+
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (urlPath === "/journal/today" || isSameDate(today, entryDateObj)) {
+        titleEl.innerText = "Today’s Entry";
+    } else if (isSameDate(yesterday, entryDateObj)) {
+        titleEl.innerText = "Yesterday’s Entry";
+    } else {
+        const options = { month: 'long', day: 'numeric' };
+        const formatted = entryDateObj.toLocaleDateString(undefined, options);
+        titleEl.innerText = `Entry from ${formatted}`;
+    }
 
     if (entryDateLabel) {
         entryDateLabel.innerText = entryDateDisplay;
@@ -29,8 +77,9 @@ export function loadJournalEntryFromDOM() {
     initAutosave(textarea);
     setupManualSave(textarea);
     setupBackButton(textarea);
-
 }
+
+
 
 
 

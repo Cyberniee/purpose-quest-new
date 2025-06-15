@@ -40,7 +40,7 @@ export async function initializeJournalDashboard() {
         if (!entries.some(e => e.label === "Today’s Entry")) {
             button.innerText = "Start writing";
             button.onclick = () => {
-                window.location.href = "/journal/today";
+                window.location.href = "/journal/";
             };
         }
 

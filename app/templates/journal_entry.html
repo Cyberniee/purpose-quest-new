@@ -33,8 +33,8 @@
                     </div>
 
                     <div class="text-center flex-grow-1">
-                        <h3 class="mb-0" id="entry-title">Today's Entry</h3>
-                        <small id="entry-date" data-label="entry-date">Saturday, June 14, 2025</small>
+                        <h3 class="mb-0" id="entry-title"></h3>
+                        <small id="entry-date" data-label="entry-date"></small>
                     </div>
 
                     <div class="d-flex gap-2">
@@ -44,17 +44,17 @@
                     </div>
                 </div>
 
-                <!-- Journal Entry Textarea -->
-                <div class="mb-4">
-                    <textarea class="form-control border border-2 product-text-area" rows="12" id="journal-textarea"
-                        data-label="journal-entry" placeholder="Start writing here...">Start writing ... </textarea>
-                </div>
-
-                <!-- Go Deeper Button -->
-                <div class="text-center">
-                    <button class="btn btn-primary" id="ai-reflection-button" data-label="go-deeper-button">
-                        🧠 Go Deeper with AI Reflection
-                    </button>
+                <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 60vh;"
+                    id="entry-section">
+                    <div class="mb-4 w-100" style="max-width: 800px;">
+                        <textarea class="form-control border border-2 product-text-area" rows="12" id="journal-textarea"
+                            data-label="journal-entry" placeholder="Start writing here..."></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" id="ai-reflection-button" data-label="go-deeper-button">
+                            🧠 Go Deeper with AI Reflection
+                        </button>
+                    </div>
                 </div>
 
             </div>
