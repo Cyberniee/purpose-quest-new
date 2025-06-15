@@ -46,38 +46,35 @@
         <script type="module">
             import { initCalendar } from '../static/js/calendar.js';
 
-            const mockJournalEntries = {
-                "2025-06-02": {
-                    date: "Monday, June 2, 2025",
-                    summary: "Reflections on new beginnings and fresh mindset",
-                    excerpt: "Started the month with a clear head. Felt focused and motivated after a long walk...",
-                    wordCount: 285
-                },
-                "2025-06-14": {
-                    date: "Saturday, June 14, 2025",
-                    summary: "Processing mid-month overwhelm",
-                    excerpt: "Feeling a bit lost today. Too many thoughts all at once — journaling helps slow it down...",
-                    wordCount: 317
-                },
-                "2025-06-20": {
-                    date: "Friday, June 20, 2025",
-                    summary: "Breakthrough on personal goals",
-                    excerpt: "Something clicked today. After weeks of circling, I realized I’ve been avoiding something big...",
-                    wordCount: 402
+            let journalDates = [];       // for calendar
+            let journalListCache = [];   // for list view
+
+            // Fetch dates only for calendar (minimal payload)
+            async function fetchJournalDates() {
+                try {
+                    const res = await fetch('/api/journal/all_dates');
+                    const { dates } = await res.json();
+                    journalDates = dates;
+                    console.log('dates: ', journalDates)
+                } catch (err) {
+                    console.error("Failed to fetch journal dates", err);
                 }
-            };
+            }
 
-            // Convert object to list format once
-            const mockJournalEntriesList = Object.entries(mockJournalEntries).map(([dateKey, entry]) => ({
-                dateKey,
-                dateDisplay: entry.date,
-                summary: entry.summary,
-                excerpt: entry.excerpt,
-                wordCount: entry.wordCount
-            }));
+            // Fetch paginated journal entry previews for list view
+            async function fetchPaginatedEntries() {
+                try {
+                    const res = await fetch('/api/journal/paginated?page=1&limit=10');
+                    const { entries } = await res.json();
+                    journalListCache = entries;
+                } catch (err) {
+                    console.error("Failed to fetch paginated entries", err);
+                }
+            }
 
+            // Use dateKey to load preview into calendar panel
             function loadJournalEntry(dateKey) {
-                const entry = mockJournalEntries[dateKey];
+                const match = journalListCache.find(entry => entry.entry_date === dateKey);
                 const container = document.getElementById("entry-preview-container");
                 const dateTitle = document.getElementById("entry-date-title");
                 const summary = document.getElementById("entry-summary-text");
@@ -86,18 +83,18 @@
                 const viewBtn = document.getElementById("view-entry-btn");
                 const editBtn = document.getElementById("edit-entry-btn");
 
-                if (entry) {
-                    dateTitle.innerText = entry.date;
-                    summary.innerText = entry.summary;
-                    excerpt.innerText = entry.excerpt;
-                    wordCount.innerText = `${entry.wordCount} words`;
-                    viewBtn.href = `/journal/view/${dateKey}`;
-                    editBtn.href = `/journal/edit/${dateKey}`;
+                if (match) {
+                    dateTitle.innerText = match.label;
+                    summary.innerText = match.summary || '';
+                    excerpt.innerText = match.preview || '';
+                    wordCount.innerText = match.word_count ? `${match.word_count} words` : '';
+                    viewBtn.href = `/journal/${match.id}`;
+                    editBtn.href = `/journal/${match.id}`;
                 } else {
                     dateTitle.innerText = new Date(dateKey).toDateString();
-                    summary.innerText = "";
-                    excerpt.innerText = "No journal entry for this date.";
-                    wordCount.innerText = "";
+                    summary.innerText = '';
+                    excerpt.innerText = "No journal entry found for this date.";
+                    wordCount.innerText = '';
                     viewBtn.href = "#";
                     editBtn.href = "#";
                 }
@@ -105,23 +102,23 @@
                 container.classList.remove("d-none");
             }
 
-            function renderListView(entries = []) {
+            function renderListView() {
                 const container = document.getElementById("entry-list-container");
                 container.innerHTML = "";
 
-                entries.forEach(entry => {
+                journalListCache.forEach(entry => {
                     const card = document.createElement("div");
                     card.className = "bg-light p-4 rounded mb-4 shadow-sm";
 
                     card.innerHTML = `
-            <h5 class="mb-1">${entry.dateDisplay}</h5>
-            <p class="text-muted fw-semibold">${entry.summary}</p>
-            <p class="mb-2">${entry.excerpt}</p>
+            <h5 class="mb-1">${entry.label}</h5>
+            <p class="text-muted fw-semibold">${entry.summary || ''}</p>
+            <p class="mb-2">${entry.preview}</p>
             <div class="d-flex justify-content-between align-items-center">
-                <small>${entry.wordCount} words</small>
+                <small>${entry.word_count || 0} words</small>
                 <div class="d-flex gap-2">
-                    <a href="/journal/view/${entry.dateKey}" class="btn btn-outline-secondary btn-sm">👁 View</a>
-                    <a href="/journal/edit/${entry.dateKey}" class="btn btn-primary btn-sm">✏️ Edit</a>
+                    <a href="/journal/${entry.id}" class="btn btn-outline-secondary btn-sm">👁 View</a>
+                    <a href="/journal/${entry.id}" class="btn btn-primary btn-sm">✏️ Edit</a>
                 </div>
             </div>
         `;
@@ -130,23 +127,26 @@
                 });
             }
 
-            document.addEventListener("DOMContentLoaded", () => {
-                // Default view is calendar
-                document.getElementById("calendar-container-wrapper").classList.remove("d-none");
-                document.getElementById("archive-list-view").classList.add("d-none");
+            document.addEventListener("DOMContentLoaded", async () => {
+                // Load data for both views
+                await Promise.all([fetchJournalDates(), fetchPaginatedEntries()]);
 
+                // Init calendar
                 initCalendar({
                     displaySelector: ".display",
                     daysContainerSelector: ".days",
                     leftArrowSelector: ".left",
                     rightArrowSelector: ".right",
                     selectedOutputSelector: ".selected",
-                    onDateSelect: (dateString) => {
-                        loadJournalEntry(dateString);
-                    },
-                    journalEntryDates: Object.keys(mockJournalEntries)
+                    onDateSelect: loadJournalEntry,
+                    journalEntryDates: journalDates
                 });
 
+                // Show calendar by default
+                document.getElementById("calendar-container-wrapper").classList.remove("d-none");
+                document.getElementById("archive-list-view").classList.add("d-none");
+
+                // Button toggling
                 const calendarBtn = document.getElementById("calendar-view-btn");
                 const listBtn = document.getElementById("list-view-btn");
 
@@ -158,10 +158,9 @@
                 listBtn.addEventListener("click", () => {
                     document.getElementById("calendar-container-wrapper").classList.add("d-none");
                     document.getElementById("archive-list-view").classList.remove("d-none");
-                    renderListView(mockJournalEntriesList);
+                    renderListView(); // reuse local cache
                 });
             });
-
         </script>
 
 </body>

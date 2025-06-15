@@ -28,6 +28,8 @@ export function loadJournalEntryFromDOM() {
 
     initAutosave(textarea);
     setupManualSave(textarea);
+    setupBackButton(textarea);
+
 }
 
 
@@ -111,3 +113,37 @@ function showSaveStatus(message, isError = false) {
         }, 3000);
     }
 }
+
+function setupBackButton(textarea) {
+    const backButton = document.getElementById("back-to-dashboard");
+    if (!backButton || !textarea) return;
+
+    backButton.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const currentContent = textarea.value.trim();
+
+        const entryId = textarea.dataset.entryId;
+
+        // Only save if changed
+        if (entryId && currentContent !== lastSavedContent) {
+            try {
+                await saveJournalContent(textarea);
+            } catch (err) {
+                console.warn("Autosave failed before back nav:", err);
+            }
+        }
+
+        // Navigate back safely
+        const fallback = "/dashboard";
+        const previous = document.referrer;
+
+        // Avoid reloading same page or broken navigation
+        if (previous && previous !== window.location.href) {
+            window.location.href = previous;
+        } else {
+            window.location.href = fallback;
+        }
+    });
+}
+

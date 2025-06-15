@@ -44,7 +44,9 @@ export function initCalendar({
             const dayDiv = document.createElement("div");
             const currentDate = new Date(year, month, i);
             const dateString = currentDate.toDateString(); // for display
-            const isoString = currentDate.toISOString().split("T")[0]; // for lookup
+            const isoString = currentDate.getFullYear()
+                + "-" + String(currentDate.getMonth() + 1).padStart(2, '0')
+                + "-" + String(currentDate.getDate()).padStart(2, '0');
 
             dayDiv.dataset.date = isoString;
             dayDiv.textContent = i;
