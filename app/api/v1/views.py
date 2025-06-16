@@ -32,7 +32,7 @@ templates.env.globals['static_file_url'] = static_file_url
 
 
 # Inject header variant
-def inject_common_context(request, user, dev_mode=False):
+def inject_common_context(request, user=None, dev_mode=False):
     today_str = date.today().isoformat()
 
     has_today_entry = False
@@ -49,6 +49,7 @@ def inject_common_context(request, user, dev_mode=False):
         "request": request,
         "user": user,
         "has_today_entry": has_today_entry,
+        "today_entry_id": res.data[0]['id'],
         "dev_mode": dev_mode,
     }
 

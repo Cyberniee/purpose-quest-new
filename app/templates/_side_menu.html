@@ -1,8 +1,11 @@
 <!-- app/templates/_side_menu.html -->
 <div class="d-flex flex-column h-100 p-3">
     <div class="mb-4 d-flex align-items-center">
-        <span class="fs-4 me-2">📖</span>
-        <strong class="fs-5">Digital Journal</strong>
+        <a href="/"
+            class="d-flex align-items-center text-dark text-decoration-none justify-content-center justify-content-md-start"
+            style="font-size: 1.2rem;font-weight: 600;">
+            Purpose Quest
+        </a>
     </div>
 
     <ul class="nav nav-pills flex-column mb-auto">
@@ -40,6 +43,6 @@
     </ul>
 
     <div class="mt-auto">
-        <a href="/logout" class="d-block text-muted small" id="logout-link">Logout</a>
+        <a href="/auth/sign_out" class="d-block text-muted small" id="logout-link">Logout</a>
     </div>
 </div>

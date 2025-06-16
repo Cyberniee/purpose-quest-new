@@ -1,0 +1,110 @@
+/* Base (non-breaking) */
+.dashboard-body {
+  margin: 0;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Sidebar shown permanently on desktop */
+.sidebar-menu-static {
+  width: 260px;
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 1rem;
+}
+
+/* ----------- Mobile Only ----------- */
+@media (max-width: 767.98px) {
+  .hamburger-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    z-index: 1100;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+  }
+
+  .sidebar-menu {
+    width: 260px;
+    background: #fff;
+    height: 100%;
+    padding: 1rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .dashboard-container {
+    height: 100vh;
+    padding: 5rem 1rem 6rem;
+    position: relative;
+    text-align: center;
+  }
+
+  .dashboard-center {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .mobile-header-title {
+    position: absolute;
+    top: 1.7rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    z-index: 900;
+    pointer-events: none; /* allows clicking hamburger through it */
+  }
+  .dashboard-footer {
+    position: fixed;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    gap: 0.5rem;
+  }
+  .dashboard-footer {
+    position: fixed;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    background: #fff;
+    /* box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05); */
+    border-radius: 0.5rem;
+    padding: 0.6rem 0;
+    font-size: 0.75rem;
+  }
+
+  .dashboard-footer .metric-cell {
+    flex: 1;
+    padding: 0 0.5rem;
+  }
+
+  .dashboard-footer .metric-cell:not(:last-child) {
+    border-right: 1px solid #ccc;
+  }
+
+  .dashboard-footer strong {
+    font-size: 0.9rem;
+  }
+
+  .tiny-card {
+    background: #f8f9fa;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    flex: 1;
+    max-width: 90px;
+  }
+}

@@ -57,7 +57,7 @@ def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
                     {
                         "sub": user.get("sub"),
                         "email": user.get("email"),
-                        "name": user.get("name", ""),
+                        "name": user.get("first_name", ""),
                         "id": user.get('id', ''),
                         "first_login": user.get("first_login", False),
                     }
