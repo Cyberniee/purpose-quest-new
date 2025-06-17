@@ -327,7 +327,9 @@ hr {
   body {
     font-size: 16px;
   }
-
+  .settings-content {
+    padding-top: 4.5rem !important;
+  }
   h1 {
     font-size: 1.8em;
   }

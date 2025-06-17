@@ -3,7 +3,7 @@ import json, urllib.parse, logging
 logger = logging.getLogger(__name__)
 
 
-def generate_user_cookies(user: dict, max_age: int = 3600) -> list:
+def generate_user_cookies(user: dict, max_age: int = (3600*24)) -> list:
     """
     Generate secure cookies for the user session.
     Includes both secure, HttpOnly tokens and frontend-accessible user data.
