@@ -12,12 +12,13 @@
 </head>
 
 <body>
+    {% include 'partials/_mobile_header.html' %}
 
     <div class="container-fluid">
-        <div class="row min-vh-100">
+        <div class="row min-vh-100 pt-md-0 pt-5">
 
             <!-- Sidebar -->
-            <div class="col-12 col-md-3 col-lg-2 bg-light p-0 border-end">
+            <div class="col-md-3 col-lg-2 d-none d-md-block bg-light p-0 border-end">
                 {% include '_side_menu.html' %}
             </div>
 
@@ -69,8 +70,12 @@
 
 <script type="module">
     import { loadJournalEntryFromDOM } from "/static/js/journal_entry.js";
+    import { setupMobileSidebar } from '/static/js/mobile_ui.js';
+
 
     document.addEventListener("DOMContentLoaded", () => {
+        setupMobileSidebar();
+
         loadJournalEntryFromDOM();
     });
 

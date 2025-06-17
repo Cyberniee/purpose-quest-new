@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Journal Archive</title>
+    <title>Your Journal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% include '_common_head.html' %}
     <link rel="stylesheet" href="{{ static_file_url('archive_calendar_style.css') }}">
@@ -11,18 +11,7 @@
 </head>
 
 <body class="archive-body">
-
-    <header class="mobile-header d-md-none d-flex align-items-center px-3 py-2">
-        <button id="hamburger-btn" class="hamburger-button me-3" aria-label="Toggle menu">☰</button>
-        <h1 class="mobile-title mb-0">Purpose Quest</h1>
-    </header>
-
-    <!-- Mobile overlay sidebar -->
-    <div id="sidebar-overlay" class="sidebar-overlay d-none d-md-none">
-        <div id="sidebar-menu" class="sidebar-menu">
-            {% include '_side_menu.html' %}
-        </div>
-    </div>
+    {% include 'partials/_mobile_header.html' %}
 
     <!-- Main Container -->
     <div class="container-fluid archive-container">
@@ -37,17 +26,13 @@
             <div class="col-12 col-md-9 col-lg-10 p-4">
 
                 <!-- Header -->
-                <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap">
-                    <div>
-                        <h2 class="mb-1" id="archive-title">Journal Archive</h2>
-                        <p class="text-muted" id="archive-subtitle">Explore your past reflections and insights</p>
-                    </div>
-                    <div class="d-flex gap-2">
+                <div class="d-flex flex-column align-items-center mb-4 text-center">
+                    <h2 class="mb-3" id="archive-title">Your Journal</h2>
+                    <div class="d-flex gap-2 justify-content-center">
                         <button class="btn btn-primary active" id="calendar-view-btn">Calendar View</button>
                         <button class="btn btn-outline-secondary" id="list-view-btn">List View</button>
                     </div>
                 </div>
-
 
                 {% include '_archive_calendar.html' %}
                 {% include '_archive_list.html' %}
@@ -57,6 +42,9 @@
         <!-- JS Script to render calendar and mock data -->
         <script type="module">
             import { initCalendar } from '../static/js/calendar.js';
+            import { setupMobileSidebar } from '/static/js/mobile_ui.js';
+
+
 
             let journalDates = [];       // for calendar
             let journalListCache = [];   // for list view
@@ -140,6 +128,8 @@
             }
 
             document.addEventListener("DOMContentLoaded", async () => {
+                setupMobileSidebar();
+
                 // Load data for both views
                 await Promise.all([fetchJournalDates(), fetchPaginatedEntries()]);
 
@@ -194,13 +184,11 @@
                 });
 
                 // Also close sidebar when clicking any link inside it
-                document.addEventListener("DOMContentLoaded", () => {
-                    setTimeout(() => {
-                        sidebarOverlay.querySelectorAll("a").forEach(link => {
-                            link.addEventListener("click", closeSidebar);
-                        });
-                    }, 0);
-                });
+                setTimeout(() => {
+                    sidebarOverlay.querySelectorAll("a").forEach(link => {
+                        link.addEventListener("click", closeSidebar);
+                    });
+                }, 0);
             });
         </script>
 

@@ -36,6 +36,8 @@ def inject_common_context(request, user=None, dev_mode=False):
     today_str = date.today().isoformat()
 
     has_today_entry = False
+    today_entry_id = None
+
     if user:
         res = supabase.table("journal_entries") \
             .select("id") \
@@ -43,15 +45,19 @@ def inject_common_context(request, user=None, dev_mode=False):
             .eq("entry_date", today_str) \
             .limit(1) \
             .execute()
+
         has_today_entry = bool(res.data)
+        if has_today_entry:
+            today_entry_id = res.data[0]["id"]
 
     return {
         "request": request,
         "user": user,
         "has_today_entry": has_today_entry,
-        "today_entry_id": res.data[0]['id'],
+        "today_entry_id": today_entry_id,
         "dev_mode": dev_mode,
     }
+
 
 
 # --------------------

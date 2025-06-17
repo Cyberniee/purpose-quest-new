@@ -13,21 +13,7 @@
 </head>
 
 <body class="dashboard-body">
-
-    <!-- Mobile Hamburger Button -->
-    <button id="hamburger-btn" class="hamburger-button d-md-none" aria-label="Toggle menu">☰</button>
-
-    <!-- Mobile Sidebar Overlay -->
-    <div id="sidebar-overlay" class="sidebar-overlay d-none d-md-none">
-        <div id="sidebar-menu" class="sidebar-menu">
-            {% include '_side_menu.html' %}
-        </div>
-    </div>
-
-    <div class="mobile-header-title d-md-none text-center">
-        <strong
-            class="d-flex align-items-center text-dark text-decoration-none justify-content-center justify-content-md-start">Purpose Quest</strong>
-    </div>
+    {% include 'partials/_mobile_header.html' %}
 
     <!-- Desktop & Mobile Layout Container -->
     <div class="container-fluid flex-grow-1">
@@ -50,7 +36,7 @@
                     </h5>
 
                     {% if has_today_entry %}
-                    <a href="/journal/{{ today_entry_id }}" class="btn btn-primary mt-1"
+                    <a href="/journal/today" class="btn btn-primary mt-1"
                         data-label="continue-entry-button">
                         Continue today’s entry
                     </a>
@@ -117,6 +103,8 @@
 
     <script type="module">
         import { initializeJournalDashboard, setupMockButton } from "/static/js/dashboard.js";
+        import { setupMobileSidebar } from '/static/js/mobile_ui.js';
+
 
         function getUserDataFromCookie() {
             const cookies = document.cookie.split(';');
@@ -142,33 +130,11 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            setupMobileSidebar();
             initializeJournalDashboard();
             setupMockButton();
             injectUserName();
 
-            const sidebarOverlay = document.getElementById("sidebar-overlay");
-            const hamburgerBtn = document.getElementById("hamburger-btn");
-
-            function closeSidebar() {
-                sidebarOverlay.classList.add("d-none");
-                hamburgerBtn.classList.remove("hidden");
-            }
-
-            hamburgerBtn.addEventListener("click", () => {
-                sidebarOverlay.classList.toggle("d-none");
-                hamburgerBtn.classList.add("hidden");
-            });
-
-            sidebarOverlay.addEventListener("click", (e) => {
-                if (e.target.id === "sidebar-overlay") {
-                    closeSidebar();
-                }
-            });
-
-            // Optional: close sidebar when clicking any link
-            sidebarOverlay.querySelectorAll("a").forEach(link => {
-                link.addEventListener("click", closeSidebar);
-            });
         });
     </script>
 
