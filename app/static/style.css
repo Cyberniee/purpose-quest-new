@@ -246,6 +246,7 @@ h3 {
   font-size: 1rem;
   --bs-btn-line-height: 1;
   max-width: 300px;
+  padding:0.6rem 1rem;
 }
 
 .custom-icon {

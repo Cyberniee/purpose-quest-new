@@ -51,30 +51,43 @@ export function initCalendar({
             dayDiv.dataset.date = isoString;
             dayDiv.textContent = i;
 
-            // Highlight today
-            if (currentDate.toDateString() === new Date().toDateString()) {
-                dayDiv.classList.add("current-date");
-            }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // strip time
+            currentDate.setHours(0, 0, 0, 0);
 
-            // Highlight entry dates
-            if (journalEntryDates.includes(isoString)) {
-                dayDiv.classList.add("has-entry");
-            }
+            // Disable future days
+            const isFuture = currentDate > today;
+            if (isFuture) {
+                dayDiv.classList.add("disabled-date");
+                dayDiv.classList.add("text-muted");
+                dayDiv.style.pointerEvents = "none";
+            } else {
+                // Highlight today
+                if (currentDate.toDateString() === new Date().toDateString()) {
+                    dayDiv.classList.add("current-date");
+                }
 
-            // Click listener
-            dayDiv.addEventListener("click", () => {
-                document.querySelectorAll(".days div.selected-date").forEach(el => {
-                    el.classList.remove("selected-date");
+                // Highlight entry dates
+                if (journalEntryDates.includes(isoString)) {
+                    dayDiv.classList.add("has-entry");
+                }
+
+                // Click listener
+                dayDiv.addEventListener("click", () => {
+                    document.querySelectorAll(".days div.selected-date").forEach(el => {
+                        el.classList.remove("selected-date");
+                    });
+
+                    dayDiv.classList.add("selected-date");
+
+                    if (selected) selected.innerHTML = `Selected Date : ${dateString}`;
+                    onDateSelect(isoString);
                 });
-
-                dayDiv.classList.add("selected-date");
-
-                if (selected) selected.innerHTML = `Selected Date : ${dateString}`;
-                onDateSelect(isoString);
-            });
+            }
 
             days.appendChild(dayDiv);
         }
+
 
     }
 

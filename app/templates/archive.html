@@ -83,24 +83,53 @@
                 const viewBtn = document.getElementById("view-entry-btn");
                 const editBtn = document.getElementById("edit-entry-btn");
 
+                const todayKey = new Date().toISOString().split("T")[0];
+
                 if (match) {
+                    // Existing entry
                     dateTitle.innerText = match.label;
                     summary.innerText = match.summary || '';
                     excerpt.innerText = match.preview || '';
                     wordCount.innerText = match.word_count ? `${match.word_count} words` : '';
+
                     viewBtn.href = `/journal/${match.id}`;
-                    editBtn.href = `/journal/${match.id}`;
+                    viewBtn.textContent = "👁 View Entry";
+                    viewBtn.classList.remove("d-none");
+
+                    if (dateKey === todayKey) {
+                        // Today with entry → View + Edit
+                        editBtn.href = `/journal/${match.id}`;
+                        editBtn.textContent = "✏️ Continue";
+                        editBtn.classList.remove("d-none");
+                    } else {
+                        // Past with entry → View only
+                        editBtn.classList.add("d-none");
+                    }
+
                 } else {
+                    // No entry
                     dateTitle.innerText = new Date(dateKey).toDateString();
                     summary.innerText = '';
                     excerpt.innerText = "No journal entry found for this date.";
                     wordCount.innerText = '';
-                    viewBtn.href = "#";
-                    editBtn.href = "#";
+
+                    if (dateKey === todayKey) {
+                        // Today with no entry → Start Writing
+                        viewBtn.href = "/journal/new";
+                        viewBtn.textContent = "✍️ Start Writing";
+                        viewBtn.classList.remove("d-none");
+                    } else {
+                        // Past/future with no entry → nothing
+                        viewBtn.classList.add("d-none");
+                    }
+
+                    editBtn.classList.add("d-none");
                 }
 
                 container.classList.remove("d-none");
             }
+
+
 
             function renderListView() {
                 const container = document.getElementById("entry-list-container");
@@ -189,6 +218,13 @@
                         link.addEventListener("click", closeSidebar);
                     });
                 }, 0);
+
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                const todayKey = `${yyyy}-${mm}-${dd}`;
+                loadJournalEntry(todayKey);
             });
         </script>
 

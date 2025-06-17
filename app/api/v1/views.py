@@ -378,7 +378,7 @@ async def cancel_page(request: Request, user: dict = Depends(get_current_user_op
 @router.get("/sign-in", response_class=HTMLResponse)
 async def sign_in_get(request: Request, user: dict = Depends(get_current_user_optional)):
     if user:
-        return RedirectResponse("/account/")
+        return RedirectResponse("/dashboard/")
     context = inject_common_context(request)
     return templates.TemplateResponse("user_signin.html", context)
 
