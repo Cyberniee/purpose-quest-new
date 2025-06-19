@@ -46,6 +46,15 @@ export function hideTooltipOnInput(event) {
     }
 }
 
+export function blurButtonsOnMouseUp() {
+    document.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("mouseup", () => {
+            btn.blur();
+        });
+    });
+}
+
+
 // export function quickNavInit() {
 //     const path = window.location.pathname;
 //     console.log(path);

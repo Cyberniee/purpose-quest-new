@@ -81,6 +81,10 @@ h3 {
 .btn-primary:focus {
   border-color: var(--color-accent);
 }
+.btn-primary:active {
+  border-color: var(--color-accent);
+  color: #fff;
+}
 
 .login-link {
   color: var(--color-link);
@@ -246,7 +250,7 @@ h3 {
   font-size: 1rem;
   --bs-btn-line-height: 1;
   max-width: 300px;
-  padding:0.6rem 1rem;
+  padding: 0.6rem 1rem;
 }
 
 .custom-icon {
@@ -258,6 +262,10 @@ h3 {
 .sub-text {
   font-size: 0.875rem; /* Assuming your base font size is 16px, this will set it to 14px. Adjust as needed. */
   color: var(--color-secondary);
+}
+
+.settings-content {
+  max-width: 900px;
 }
 
 .nav-item:hover {

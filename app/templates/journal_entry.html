@@ -50,12 +50,66 @@
                     <div class="mb-4 w-100" style="max-width: 800px;">
                         <textarea class="form-control border border-2 product-text-area" rows="12" id="journal-textarea"
                             data-label="journal-entry" placeholder="Start writing here..."></textarea>
+
+                        <!-- Voice Control Wrapper -->
+                        <div class="position-relative">
+                            <!-- Voice Control Buttons -->
+                            <div class="btn-group mt-3 shadow-sm" role="group" aria-label="Voice control bar">
+                                <!-- Mic Button -->
+                                <button type="button" class="btn btn-secondary" id="mic-btn" title="Start recording">
+                                    🎤
+                                </button>
+
+                                <!-- Provider Dropdown -->
+                                <div class="btn-group" role="group">
+                                    <button id="providerDropdown" type="button"
+                                        class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        Provider
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="providerDropdown">
+                                        <li><a class="dropdown-item" href="#" data-provider="webspeech">Web Speech
+                                                API</a></li>
+                                        <li><a class="dropdown-item" href="#" data-provider="openai">OpenAI API</a></li>
+                                        <li><a class="dropdown-item" href="#" data-provider="osnative">OS Native</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Language Dropdown -->
+                                <div class="btn-group" role="group">
+                                    <button id="languageDropdown" type="button"
+                                        class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        Language
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="languageDropdown" id="language-options">
+                                        <li><a class="dropdown-item" href="#" data-lang="en-US">English (US)</a></li>
+                                        <li><a class="dropdown-item" href="#" data-lang="en-GB">English (UK)</a></li>
+                                        <li><a class="dropdown-item" href="#" data-lang="nl-NL">Dutch (NL)</a></li>
+                                        <li><a class="dropdown-item" href="#" data-lang="de-DE">German (DE)</a></li>
+                                        <li><a class="dropdown-item" href="#" data-lang="fr-FR">French (FR)</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                            <!-- Floating Instructions -->
+                            <div id="voice-instructions" class="alert alert-info d-none position-absolute mt-1"
+                                style="z-index: 10; width: max-content; min-width: 250px;"></div>
+                        </div>
+
+                        <!-- Status (still flows normally) -->
+                        <small id="voice-status" class="text-muted d-block mt-2">Provider: Web Speech API | Status:
+                            Idle</small>
+
+
                     </div>
-                    <div class="text-center">
+                    <!-- <div class="text-center">
                         <button class="btn btn-primary" id="ai-reflection-button" data-label="go-deeper-button">
                             🧠 Go Deeper with AI Reflection
                         </button>
-                    </div>
+                    </div> -->
                 </div>
 
             </div>
@@ -71,12 +125,25 @@
 <script type="module">
     import { loadJournalEntryFromDOM } from "/static/js/journal_entry.js";
     import { setupMobileSidebar } from '/static/js/mobile_ui.js';
+    import { setupVoiceControl } from '/static/js/voice_control.js';
+    import { blurButtonsOnMouseUp } from "/static/js/utils.js";
+
+
 
 
     document.addEventListener("DOMContentLoaded", () => {
         setupMobileSidebar();
-
         loadJournalEntryFromDOM();
+        setupVoiceControl();
+        blurButtonsOnMouseUp();
+
+
+        document.querySelectorAll("button").forEach(btn => {
+            btn.addEventListener("mouseup", () => {
+                btn.blur(); // remove focus after click-release
+            });
+        });
+
     });
 
 </script>

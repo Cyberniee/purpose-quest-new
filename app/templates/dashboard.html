@@ -33,19 +33,18 @@
                     <p id="current-date" data-label="current-date">{{ current_date }}</p>
                     <h2 id="reflection-title" class="mt-3 mb-4">
                         Welcome back, <span id="user-name-placeholder"></span>ready to reflect?
-                    </h5>
+                        </h5>
 
-                    {% if has_today_entry %}
-                    <a href="/journal/today" class="btn btn-primary mt-1 p-3"
-                        data-label="continue-entry-button">
-                        Continue today’s entry
-                    </a>
-                    {% else %}
-                    <a href="/journal/today" class="btn btn-primary mt-1 p-3" data-label="start-writing-button"
-                        id="start-writing-btn">
-                        Start Writing
-                    </a>
-                    {% endif %}
+                        {% if has_today_entry %}
+                        <a href="/journal/today" class="btn btn-primary mt-1 p-3" data-label="continue-entry-button">
+                            Continue today’s entry
+                        </a>
+                        {% else %}
+                        <a href="/journal/today" class="btn btn-primary mt-1 p-3" data-label="start-writing-button"
+                            id="start-writing-btn">
+                            Start Writing
+                        </a>
+                        {% endif %}
                 </div>
 
                 <!-- Metrics Section -->
@@ -104,6 +103,7 @@
     <script type="module">
         import { initializeJournalDashboard, setupMockButton } from "/static/js/dashboard.js";
         import { setupMobileSidebar } from '/static/js/mobile_ui.js';
+        import { blurButtonsOnMouseUp } from "/static/js/utils.js";
 
 
         function getUserDataFromCookie() {
@@ -134,6 +134,8 @@
             initializeJournalDashboard();
             setupMockButton();
             injectUserName();
+            blurButtonsOnMouseUp();
+
 
         });
     </script>
