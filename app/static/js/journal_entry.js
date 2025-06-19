@@ -32,18 +32,24 @@ export async function loadJournalEntryFromDOM() {
             return;
         }
     } else {
-        // Fallback to server-injected metadata
-        if (!meta) return;
+        // Just fetch from the API based on the URL pattern
+        try {
+            const res = await fetch(`/api/journal${urlPath}`);
+            const data = await res.json();
 
-        entryId = meta.dataset.entryId;
-        entryDate = meta.dataset.entryDate;
-        entryDateDisplay = meta.dataset.entryDateDisplay;
-        content = meta.dataset.entryContent || "";
+            entryId = data.id;
+            entryDate = data.entry_date;
+            entryDateDisplay = data.entry_date_display;
+            content = data.content || "";
+        } catch (err) {
+            console.error("Failed to load entry:", err);
+            return;
+        }
     }
 
     // Populate form
     textarea.disabled = false;
-    textarea.value = content;
+    textarea.value = decodeHtmlEntities(content || "");
     lastSavedContent = content;
     textarea.dataset.entryId = entryId;
 
@@ -101,6 +107,12 @@ function resetAutosaveTimer(textarea) {
     autosaveTimer = setTimeout(() => {
         saveJournalContent(textarea);
     }, 10000);
+}
+
+function decodeHtmlEntities(text) {
+    const div = document.createElement("div");
+    div.innerHTML = text;
+    return div.textContent;
 }
 
 export async function saveJournalContent(textarea) {

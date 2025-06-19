@@ -1,5 +1,5 @@
 // static/js/archive_page.js
-import { initCalendar } from '../static/js/calendar.js';
+import { initCalendar } from '/static/js/calendar.js';
 import { setupMobileSidebar } from '/static/js/mobile_ui.js';
 
 let journalDates = [];       // for calendar
@@ -129,6 +129,10 @@ function setupViewToggles() {
 export async function initArchivePage() {
     setupMobileSidebar();
     await Promise.all([fetchJournalDates(), fetchPaginatedEntries()]);
+
+    // show the calendar by default
+    document.getElementById("calendar-container-wrapper").classList.remove("d-none");
+    document.getElementById("archive-list-view").classList.add("d-none");
 
     initCalendar({
         displaySelector: ".display",

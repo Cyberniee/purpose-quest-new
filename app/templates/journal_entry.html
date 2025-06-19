@@ -115,12 +115,13 @@
             </div>
         </div>
     </div>
-    <div id="journal-metadata" data-entry-id="{{ entry_id }}" data-entry-date="{{ entry_date }}"
+    <!-- <div id="journal-metadata" data-entry-id="{{ entry_id }}" data-entry-date="{{ entry_date }}"
         data-entry-date-display="{{ display_date }}"
         data-entry-content="{{ content | replace('\n', '&#10;') | replace('"', ' &quot;') }}">
-    </div>
+    </div> -->
 
 </body>
+
 
 <script type="module">
     import { loadJournalEntryFromDOM } from "/static/js/journal_entry.js";
@@ -129,20 +130,11 @@
     import { blurButtonsOnMouseUp } from "/static/js/utils.js";
 
 
-
-
     document.addEventListener("DOMContentLoaded", () => {
         setupMobileSidebar();
         loadJournalEntryFromDOM();
         setupVoiceControl();
         blurButtonsOnMouseUp();
-
-
-        document.querySelectorAll("button").forEach(btn => {
-            btn.addEventListener("mouseup", () => {
-                btn.blur(); // remove focus after click-release
-            });
-        });
 
     });
 
