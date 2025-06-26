@@ -6,6 +6,13 @@ from fastapi.responses import JSONResponse
 from termcolor import colored  # for colored output
 
 
+def api_response(data=None, status="ok", message=None, code=200):
+    return JSONResponse(status_code=code, content={
+        "status": status,
+        "data": data,
+        "message": message
+    })
+
 
 def async_exception_handler(func):
     @functools.wraps(func)

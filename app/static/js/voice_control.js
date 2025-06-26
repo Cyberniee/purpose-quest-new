@@ -30,6 +30,8 @@ export function setupVoiceControl({
 
 
     let currentProvider = "webspeech";
+    providerDropdown.textContent = "Provider: Web Speech API";
+    langDropdownBtn.textContent = "Language: English (US)";
     let selectedLanguage = "en-US";
     let finalTranscript = ""; // buffer for confirmed text
 

@@ -1,15 +1,12 @@
 # app/api/v1/views.py
 import os, logging
-from uuid import UUID
 from datetime import datetime, date
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
 from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from app.config.auth_config import supabase_client as supabase
 from app.utils.common_utils import validate_data_presence
-from app.modules.services.journal.journal_services import get_journal_entry_by_id, get_or_create_today_entry
+from app.modules.services.journal.journal_services import get_journal_entry_by_id
 from app.dependencies.auth import get_current_user_optional, get_current_user_required
 
 router = APIRouter()
@@ -320,25 +317,29 @@ async def open_journal_entry(
     request: Request,
     user=Depends(get_current_user_optional),
 ):
-    
-    entry = await get_journal_entry_by_id(entry_id, user["id"])
+    try:
+        entry = await get_journal_entry_by_id(entry_id, user["id"])
 
-    logger.info(f'entry we got: {entry}')
-    if not entry:
-        raise HTTPException(status_code=404, detail="Entry not found")
+        logger.info(f'entry we got: {entry}')
+        if not entry:
+            raise HTTPException(status_code=404, detail="Entry not found")
 
-    entry_date_obj = datetime.strptime(entry["entry_date"], "%Y-%m-%d").date()
+        # entry_date_obj = datetime.strptime(entry["entry_date"], "%Y-%m-%d").date()
 
-    return templates.TemplateResponse(
-        "journal_entry.html",
-        {
-            "request": request,
-            "entry_id": entry["id"],
-            "entry_date": entry["entry_date"],
-            "content": entry["content"],
-            "display_date": entry_date_obj.strftime("%A, %B %d, %Y"),
-        },
-    )
+        return templates.TemplateResponse(
+            "journal_entry.html",
+            {
+                "request": request,
+                # "entry_id": entry["id"],
+                # "entry_date": entry["entry_date"],
+                "content": entry["content"],
+                # "display_date": entry_date_obj.strftime("%A, %B %d, %Y"),
+            },
+        )
+    except Exception as e:
+        logger.error("Error in /today:", e)
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 
 

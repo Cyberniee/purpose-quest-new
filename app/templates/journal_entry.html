@@ -38,10 +38,12 @@
                         <small id="entry-date" data-label="entry-date"></small>
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-secondary" id="analyze-button" data-label="analyze-button">💡
-                            Analyze</button>
+                    <div class="d-flex gap-2 position-relative" style="display: inline-block;">
                         <button class="btn btn-primary" id="save-button" data-label="save-button">💾 Save</button>
+                        <small id="save-status"
+                            class="text-muted position-absolute translate-middle-x text-center d-none"
+                            style="top: 100%; left: 50%; margin-top: 4px;">
+                        </small>
                     </div>
                 </div>
 
@@ -54,7 +56,7 @@
                         <!-- Voice Control Wrapper -->
                         <div class="position-relative">
                             <!-- Voice Control Buttons -->
-                            <div class="btn-group mt-3 shadow-sm" role="group" aria-label="Voice control bar">
+                            <div class="d-flex flex-column flex-md-row gap-2 mt-3 shadow-sm" id="voice-control-bar">
                                 <!-- Mic Button -->
                                 <button type="button" class="btn btn-secondary" id="mic-btn" title="Start recording">
                                     🎤

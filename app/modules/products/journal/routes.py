@@ -3,15 +3,17 @@
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.requests import Request
+from fastapi.responses import JSONResponse
 from datetime import datetime, date
 from pydantic import BaseModel
 
 from app.modules.services.auth.auth_utils import AuthenticationUtils
-from app.utils.common_utils import format_entry_label, validate_data_presence
+from app.utils.common_utils import format_entry_label, validate_data_presence, api_response
 from app.config.auth_config import supabase_client as supabase
 from app.modules.services.journal.journal_services import (
     get_or_create_today_entry,
     update_journal_entry,
+    get_journal_entry_by_id
 )
 
 router = APIRouter()
@@ -37,6 +39,7 @@ async def fetch_or_create_today_journal(
         "entry_date_display": entry_date_obj.strftime("%A, %B %d, %Y"),
         "content": entry.get("content", ""),
     }
+
 
 
 @router.get("/recent")
@@ -151,8 +154,39 @@ async def get_paginated_journal_entries(
     }
 
 
+@router.get("/entry/{entry_id}")
+async def open_journal_entry(
+    entry_id: str,
+    request: Request,
+    user=Depends(AuthenticationUtils.get_authenticated_user),
+):
+    try:
+        entry = await get_journal_entry_by_id(entry_id, user["id"])
 
-@router.patch("/{entry_id}")
+        logger.info(f'entry we got: {entry}')
+        if not entry:
+            raise HTTPException(status_code=404, detail="Entry not found")
+
+        # entry_date_obj = datetime.strptime(entry["entry_date"], "%Y-%m-%d").date()
+
+        return api_response(data=entry)
+        # return JSONResponse(
+        #     "journal_entry.html",
+        #     {
+        #         "request": request,
+        #         # "entry_id": entry["id"],
+        #         # "entry_date": entry["entry_date"],
+        #         "content": entry["content"],
+        #         # "display_date": entry_date_obj.strftime("%A, %B %d, %Y"),
+        #     },
+        # )
+    except Exception as e:
+        logger.error("Error in /today:", e)
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+
+@router.patch("/entry/{entry_id}")
 async def update_entry(
     entry_id: str,
     payload: JournalUpdatePayload,

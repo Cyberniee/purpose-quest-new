@@ -9,7 +9,6 @@ let saveStatusTimeout = null;
 export async function loadJournalEntryFromDOM() {
     const textarea = document.getElementById("journal-textarea");
     const entryDateLabel = document.getElementById("entry-date");
-    const meta = document.getElementById("journal-metadata");
     const titleEl = document.getElementById("entry-title");
     const urlPath = window.location.pathname;
 
@@ -32,15 +31,22 @@ export async function loadJournalEntryFromDOM() {
             return;
         }
     } else {
-        // Just fetch from the API based on the URL pattern
-        try {
-            const res = await fetch(`/api/journal${urlPath}`);
-            const data = await res.json();
+        // Extract entryId from URL: /journal/{entryId}
+        const match = urlPath.match(/^\/journal\/([a-f0-9\-]+)$/);
+        if (!match) {
+            console.error("Invalid journal entry URL format:", urlPath);
+            return;
+        }
 
-            entryId = data.id;
-            entryDate = data.entry_date;
-            entryDateDisplay = data.entry_date_display;
-            content = data.content || "";
+        const extractedEntryId = match[1];
+
+        try {
+            const res = await fetch(`/api/journal/entry/${extractedEntryId}`);
+            const jsonres = await res.json();
+            entryId = jsonres.data.id;
+            entryDate = jsonres.data.entry_date;
+            entryDateDisplay = jsonres.data.entry_date;
+            content = jsonres.data.content || "";
         } catch (err) {
             console.error("Failed to load entry:", err);
             return;
@@ -52,6 +58,7 @@ export async function loadJournalEntryFromDOM() {
     textarea.value = decodeHtmlEntities(content || "");
     lastSavedContent = content;
     textarea.dataset.entryId = entryId;
+
 
     // Set title based on entry date
     const entryDateObj = new Date(entryDate);
@@ -122,7 +129,7 @@ export async function saveJournalContent(textarea) {
     if (!entryId || currentContent === lastSavedContent) return;
 
     try {
-        const response = await fetch(`/api/journal/${entryId}`, {
+        const response = await fetch(`/api/journal/entry/${entryId}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ content: currentContent }),
@@ -152,28 +159,24 @@ function setupManualSave(textarea) {
 
 function showSaveStatus(message, isError = false) {
     let statusEl = document.getElementById("save-status");
-
-    if (!statusEl) {
-        statusEl = document.createElement("small");
-        statusEl.id = "save-status";
-        statusEl.classList.add("text-muted", "d-block", "mt-2", "text-end");
-        document.getElementById("save-button")?.parentNode?.appendChild(statusEl);
-    }
+    if (!statusEl) return;
 
     statusEl.innerText = message;
+    statusEl.classList.remove("d-none");
     statusEl.style.color = isError ? "red" : "green";
     statusEl.style.opacity = "1";
 
     // Clear existing timeout if any
     if (saveStatusTimeout) clearTimeout(saveStatusTimeout);
 
-    // Only hide if success
     if (!isError) {
         saveStatusTimeout = setTimeout(() => {
             statusEl.style.opacity = "0";
+            statusEl.classList.add("d-none");
         }, 3000);
     }
 }
+
 
 function setupBackButton(textarea) {
     const backButton = document.getElementById("back-to-dashboard");
