@@ -15,11 +15,23 @@ export async function loadJournalEntryFromDOM() {
     if (!textarea || !titleEl) return;
 
     let entryId, entryDate, entryDateDisplay, content;
+    // Get current local date in ISO format
+    const localDate = new Date().toISOString().slice(0, 10);
+
 
     if (urlPath === "/journal/today") {
         // Dynamically fetch or create today's entry
         try {
-            const res = await fetch("/api/journal/today", { method: "POST" });
+
+            const res = await fetch("/api/journal/today", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    local_date: localDate,
+                })
+            });
             const data = await res.json();
 
             entryId = data.id;
@@ -30,6 +42,7 @@ export async function loadJournalEntryFromDOM() {
             console.error("Failed to fetch/create today's entry", err);
             return;
         }
+        
     } else {
         // Extract entryId from URL: /journal/{entryId}
         const match = urlPath.match(/^\/journal\/([a-f0-9\-]+)$/);
@@ -173,7 +186,7 @@ function showSaveStatus(message, isError = false) {
         saveStatusTimeout = setTimeout(() => {
             statusEl.style.opacity = "0";
             statusEl.classList.add("d-none");
-        }, 3000);
+        }, 1000);
     }
 }
 

@@ -47,16 +47,17 @@
                     </div>
                 </div>
 
-                <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 60vh;"
+                <div class="d-flex flex-column my-auto justify-content-center align-items-center mb-5"
                     id="entry-section">
-                    <div class="mb-4 w-100" style="max-width: 800px;">
-                        <textarea class="form-control border border-2 product-text-area" rows="12" id="journal-textarea"
-                            data-label="journal-entry" placeholder="Start writing here..."></textarea>
+                    <div class="journal-wrapper d-flex flex-column flex-grow-1 w-100 mx-0 mx-md-auto"
+                        style="max-width: 800px;">
+                        <textarea id="journal-textarea" class="form-control flex-grow-1"
+                            placeholder="Start writing here..."></textarea>
 
                         <!-- Voice Control Wrapper -->
                         <div class="position-relative">
                             <!-- Voice Control Buttons -->
-                            <div class="d-flex flex-column flex-md-row gap-2 mt-3 shadow-sm" id="voice-control-bar">
+                            <div class="d-flex flex-column flex-md-row gap-2 mt-3" id="voice-control-bar">
                                 <!-- Mic Button -->
                                 <button type="button" class="btn btn-secondary" id="mic-btn" title="Start recording">
                                     🎤

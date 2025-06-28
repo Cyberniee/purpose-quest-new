@@ -7,44 +7,7 @@ export async function initializeJournalDashboard() {
     if (!button) return;
 
     try {
-        // const res = await fetch("/api/journal/recent");
-        // const { entries } = await res.json();
         console.log("init dashboard")
-
-        // container.innerHTML = "";
-
-        // entries.forEach((entry, index) => {
-        //     // Update start button if today's entry is found first
-        //     if (index === 0 && entry.label === "Today’s Entry") {
-        //         button.innerText = "Continue today’s entry";
-        //         button.dataset.entryId = entry.id;
-        //         button.onclick = () => {
-        //             window.location.href = `/journal/${entry.id}`;
-        //         };
-        //     }
-
-        //     const div = document.createElement("div");
-        //     div.classList.add("mb-3");
-
-        //     div.innerHTML = `
-        //         <a href="/journal/${entry.id}" class="text-decoration-none text-dark">
-        //             <div class="border-start border-4 ps-3" data-label="reflection-entry">
-        //                 <strong>${entry.label}</strong>
-        //                 <p class="mb-0">${entry.preview}</p>
-        //             </div>
-        //         </a>
-        //     `;
-
-        //     container.appendChild(div);
-        // });
-
-        // // If no today entry found, fallback
-        // if (!entries.some(e => e.label === "Today’s Entry")) {
-        //     button.innerText = "Start writing";
-        //     button.onclick = () => {
-        //         window.location.href = "/journal/today";
-        //     };
-        // }
         const dates_res = await fetch("/api/journal/all_dates");
         const { dates } = await dates_res.json();
         const dateSet = new Set(dates);
@@ -58,6 +21,13 @@ export async function initializeJournalDashboard() {
         let currentDate = new Date();
         const formatDate = d => d.toISOString().split("T")[0];
 
+        // if today not written, step back to yesterday to start checking
+        const todayStr = formatDate(currentDate);
+        if (!dateSet.has(todayStr)) {
+            currentDate.setDate(currentDate.getDate() - 1);
+        }
+
+        // now count backwards as long as dates are present
         while (true) {
             const dateStr = formatDate(currentDate);
             if (dateSet.has(dateStr)) {
@@ -68,6 +38,7 @@ export async function initializeJournalDashboard() {
             }
         }
 
+        // render
         document.querySelectorAll("#total-entries-count").forEach(el => {
             el.textContent = totalEntries;
         });

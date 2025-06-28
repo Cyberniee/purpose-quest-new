@@ -1,5 +1,5 @@
 # app/modules/products/journal/routes.py
-# /api/journal
+# endpoint is /api/journal
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.requests import Request
@@ -22,14 +22,23 @@ logger = logging.getLogger(__name__)
 class JournalUpdatePayload(BaseModel):
     content: str
 
+class TodayJournalRequest(BaseModel):
+    local_date: str
+
+
 
 @router.post("/today")
 async def fetch_or_create_today_journal(
+    payload: TodayJournalRequest,
     current_user=Depends(AuthenticationUtils.get_authenticated_user),
 ):
     user_id = current_user["id"]
 
-    entry = await get_or_create_today_entry(user_id, create=True)
+    # get local_date and offset from client
+    local_date = payload.local_date
+
+
+    entry = await get_or_create_today_entry(user_id=user_id, local_date=local_date)
     # Parse the ISO date string (e.g., "2025-06-14")
     entry_date_obj = datetime.strptime(entry["entry_date"], "%Y-%m-%d").date()
 
@@ -84,7 +93,7 @@ async def get_all_entry_dates(
 
     entries = (
         supabase.table("journal_entries")
-        .select("created_at")
+        .select("created_at", "entry_date")
         .eq("user_id", user_id)
         .order("created_at", desc=True)
         .execute()
@@ -96,7 +105,8 @@ async def get_all_entry_dates(
 
     return {
         "dates": [
-            entry["created_at"].split("T")[0]  # Extract date part
+            # entry["created_at"].split("T")[0]  # Extract date part from serverdata
+            entry["entry_date"]  # from entry date, local to user
             for entry in entries.data
         ]
     }
@@ -127,7 +137,7 @@ async def get_paginated_journal_entries(
 
     # Fetch paginated results
     data_res = supabase.table("journal_entries") \
-        .select("id, content, created_at") \
+        .select("id, content, created_at, word_count") \
         .eq("user_id", user_id) \
         .order("created_at", desc=True) \
         .range(offset, offset + limit - 1) \
@@ -141,6 +151,7 @@ async def get_paginated_journal_entries(
         entries.append({
             "id": entry["id"],
             "preview": entry["content"][:120].split("\n")[0].strip() + "...",
+            "word_count": entry["word_count"],
             "entry_date": date_str,
             "label": format_entry_label(date_str)
         })

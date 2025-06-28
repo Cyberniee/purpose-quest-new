@@ -2,29 +2,21 @@ from datetime import date
 from app.config.auth_config import supabase_client as supabase
 from app.utils.common_utils import validate_data_presence
 
-async def get_or_create_today_entry(user_id: str, create:bool=True):
-    today_str = date.today().isoformat()
-
-    # Try to fetch
-    res = supabase.table("journal_entries") \
-        .select("*") \
-        .eq("user_id", user_id) \
-        .eq("entry_date", today_str) \
-        .limit(1) \
-        .execute()
+async def get_or_create_today_entry(user_id: str, local_date: str, create:bool=True):
+    today_str = local_date
+    # try to fetch
+    res = supabase.table("journal_entries").select("*").eq("user_id", user_id).eq("entry_date", today_str).limit(1).execute()
 
     if validate_data_presence(res):
         return res.data[0]
-
     if create:
-        # Create new entry if not found
+        # create it
         insert = supabase.table("journal_entries").insert({
             "user_id": user_id,
             "entry_date": today_str,
             "content": "",
             "word_count": 0
         }).execute()
-
         return insert.data[0]
 
 

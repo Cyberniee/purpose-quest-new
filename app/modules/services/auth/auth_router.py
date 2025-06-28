@@ -137,7 +137,8 @@ async def sign_in(request: Request, response: Response):
             "email": email,
             "sub": user.get('sub', ''),
             "id": user.get('id', ''),
-            "name": user.get('name', ''),  # Optional
+            "name": user.get('first_name', ''),
+            "tz_offset": user.get('user_settings', {}).get('tz_offset', 0),
             "first_login": user.get('first_login', False)  # Optional, default to False
         }):
             response.set_cookie(**cookie)

@@ -73,7 +73,8 @@ class AuthenticationUtils:
                 return user_data
 
         # 🧠 Otherwise fetch from Supabase
-        user_result = supabase.table("users").select("*").eq("sub", auth_user_id).single().execute()
+        user_result = supabase.table("users").select("*, user_settings(tz_offset)").eq("sub", auth_user_id).single().execute()
+        logger.info(f'user_results: {user_result}')
 
         if not validate_data_presence(user_result):
             if require_auth:

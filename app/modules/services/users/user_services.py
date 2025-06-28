@@ -72,7 +72,7 @@ async def update_user(user_id: UUID, data: dict) -> dict:
 
 async def get_user_by_supabase_auth_id(sub: UUID) -> dict | None:
     try:
-        response = supabase.table("users").select("*").eq("sub", sub).single().execute()
+        response = supabase.table("users").select("*, user_settings(tz_offset)").eq("sub", sub).single().execute()
         if not validate_data_presence(response):
             logger.info(f"User with id {sub} not found")
             return None

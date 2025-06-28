@@ -124,16 +124,19 @@ export function setupVoiceControl({
                 langDropdownBtn.textContent = `Language: Automatic`;
                 languageWrapper?.classList.add("d-none");
             } else if (currentProvider === "osnative") {
-                const platform = navigator.platform.toLowerCase();
+                const platform = navigator.userAgent.toLowerCase();
+                console.log(platform)
                 let tip = "💡 Use the mic button on your keyboard or mobile keyboard.";
                 if (platform.includes("win")) tip = "💡 Press <strong>Win + H</strong> for Windows dictation.";
-                else if (platform.includes("mac")) tip = "💡 Press <strong>Fn</strong> twice to start macOS dictation.";
+                else if (platform.includes('Mac')) tip = "💡 Press <strong>Fn</strong> twice to start macOS dictation. (Or your custom dictation shortcut)";
 
                 instructionBox.innerHTML = tip;
                 instructionBox.classList.remove("d-none");
 
                 langDropdownBtn.textContent = `Language: Device-specific`;
                 languageWrapper?.classList.add("d-none");
+                textarea?.focus();
+
             }
         });
     });

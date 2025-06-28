@@ -1,6 +1,6 @@
 # app/api/v1/views.py
 import os, logging
-from datetime import datetime, date
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -30,12 +30,27 @@ templates.env.globals['static_file_url'] = static_file_url
 
 # Inject header variant
 def inject_common_context(request, user=None, dev_mode=False):
-    today_str = date.today().isoformat()
-
     has_today_entry = False
     today_entry_id = None
-
+    today_str = None
+    
     if user:
+        try:
+            tz_offset_min = user.get("user_settings", {}).get("tz_offset", 0)
+            # server time in UTC
+            now_utc = datetime.now(timezone.utc)
+            
+            # offset as timedelta
+            user_offset = timedelta(minutes=-tz_offset_min)  # note minus because offset is *minutes behind UTC*
+            
+            # user local time
+            user_local_time = now_utc + user_offset
+            
+            today_str = user_local_time.date().isoformat()
+        except Exception as e:
+            # fallback to UTC today if anything goes wrong
+            today_str = datetime.now(timezone.utc).date().isoformat()
+        
         res = supabase.table("journal_entries") \
             .select("id") \
             .eq("user_id", user["id"]) \
@@ -52,6 +67,7 @@ def inject_common_context(request, user=None, dev_mode=False):
         "user": user,
         "has_today_entry": has_today_entry,
         "today_entry_id": today_entry_id,
+        "today_str": today_str,
         "dev_mode": dev_mode,
     }
 

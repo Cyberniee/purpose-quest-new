@@ -16,10 +16,17 @@
             </a>
         </li>
         <li>
+            {% if has_today_entry %}
             <a href="/journal/today" class="nav-link {% if request.url.path == '/journal/today' %}active{% endif %}"
                 id="nav-journal">
-                {% if has_today_entry %}Today’s Entry{% else %}New Entry{% endif %}
+                Today’s Entry 
             </a>
+            {% else %}
+            <a href="/journal/today" class="nav-link {% if request.url.path == '/journal/today' %}active{% endif %}"
+                id="nav-journal">
+                New Entry
+            </a>
+            {% endif %}
         </li>
         <li>
             <a href="/journal/archive" class="nav-link {% if request.url.path == '/journal/archive' %}active{% endif %}"

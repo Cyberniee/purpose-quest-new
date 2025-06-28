@@ -60,6 +60,7 @@ def generate_user_cookies(user: dict, max_age: int = (3600*24)) -> list:
                         "name": user.get("first_name", ""),
                         "id": user.get('id', ''),
                         "first_login": user.get("first_login", False),
+                        "tz_offset": user.get('tz_offset', 0),
                     }
                 )
             ),
