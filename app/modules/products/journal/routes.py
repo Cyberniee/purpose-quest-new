@@ -1,15 +1,19 @@
 # app/modules/products/journal/routes.py
 # endpoint is /api/journal
-import logging
-from fastapi import APIRouter, Depends, HTTPException
+import logging, asyncio, websockets, json
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from datetime import datetime, date
 from pydantic import BaseModel
 
+
 from app.modules.services.auth.auth_utils import AuthenticationUtils
 from app.utils.common_utils import format_entry_label, validate_data_presence, api_response
 from app.config.auth_config import supabase_client as supabase
+from app.config.general_config import OpenAISettings
+
+
 from app.modules.services.journal.journal_services import (
     get_or_create_today_entry,
     update_journal_entry,
@@ -25,6 +29,8 @@ class JournalUpdatePayload(BaseModel):
 class TodayJournalRequest(BaseModel):
     local_date: str
 
+CHUNK_THRESHOLD_BYTES = 8_000   # lower threshold for quicker send
+FLUSH_INTERVAL_MS = 300         # shorter flush interval
 
 
 @router.post("/today")
@@ -207,6 +213,95 @@ async def update_entry(
     if not success:
         raise HTTPException(status_code=403, detail="Update failed")
     return {"status": "save ok"}
+
+
+
+# @router.websocket("/ws/transcription")
+# async def websocket_transcription_proxy(websocket: WebSocket):
+#     await websocket.accept()
+#     logger.info("🔊 Client WebSocket accepted for transcription")
+
+#     openai_url = f"{OpenAISettings.realtime_endpoint}?intent=transcription"
+#     try:
+#         async with websockets.connect(
+#             openai_url,
+#             extra_headers={
+#                 "Authorization": f"Bearer {OpenAISettings.api_key}",
+#                 "OpenAI-Beta": "realtime=v1"
+#             }
+#         ) as openai_ws:
+#             logger.info("✅ Connected to OpenAI transcription WebSocket")
+
+#             # Session config
+#             init_payload = {
+#                 "object": "realtime.transcription_session",
+#                 "input_audio_format": OpenAISettings.transcription_format,
+#                 "input_audio_transcription": [{
+#                     "model": OpenAISettings.transcription_model,
+#                     "prompt": "",
+#                     "language": OpenAISettings.transcription_language
+#                 }],
+#                 "turn_detection": {
+#                     "type": "server_vad",
+#                     "threshold": 0.5
+#                 },
+#                 "input_audio_noise_reduction": {
+#                     "type": OpenAISettings.transcription_noise_reduction
+#                 }
+#             }
+#             await openai_ws.send(json.dumps(init_payload))
+#             logger.info("📨 Sent session init")
+
+#             session_ready = False
+
+#             async def client_to_openai():
+#                 try:
+#                     while websocket.client_state.name == "CONNECTED" and openai_ws.open:
+#                         chunk = await websocket.receive_bytes()
+#                         logger.debug(f"Chunk received with {len(chunk)} bytes before converting to PCM")
+
+#                         if not session_ready:
+#                             continue
+#                         # convert to a list of integers for JSON
+#                         pcm_list = []
+#                         if len(chunk) % 2 != 0:
+#                             chunk = chunk[:-1]  # drop the trailing byte to stay aligned
+
+#                         for i in range(0, len(chunk), 2):
+#                             sample = int.from_bytes(chunk[i:i+2], byteorder='little', signed=True)
+#                             pcm_list.append(sample)
+
+#                         await openai_ws.send(json.dumps({
+#                             "type": "input_audio_buffer.append",
+#                             "data": pcm_list
+#                         }))
+#                         logger.debug(f"▶️ Forwarded {len(chunk)} PCM bytes to OpenAI")
+#                 except Exception as e:
+#                     logger.error(f"Client->OpenAI error: {e}")
+#                 finally:
+#                     await websocket.close()
+
+#             async def openai_to_client():
+#                 nonlocal session_ready
+#                 try:
+#                     async for message in openai_ws:
+#                         data = json.loads(message)
+#                         if data.get("type") == "transcription_session.created":
+#                             session_ready = True
+#                             logger.info("🟢 Session ready")
+#                         await websocket.send_text(message)
+#                 except Exception as e:
+#                     logger.error(f"OpenAI->Client error: {e}")
+#                 finally:
+#                     await websocket.close()
+
+#             await asyncio.gather(client_to_openai(), openai_to_client())
+
+#     except Exception as e:
+#         logger.exception(f"❌ Proxy error: {e}")
+#         if websocket.client_state.name == "CONNECTED":
+#             await websocket.close()
+
 
 
 @router.post("/mock/dev")

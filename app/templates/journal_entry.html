@@ -71,10 +71,8 @@
                                         Provider
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="providerDropdown">
-                                        <li><a class="dropdown-item" href="#" data-provider="webspeech">Web Speech
-                                                API</a></li>
-                                        <li><a class="dropdown-item" href="#" data-provider="openai">OpenAI API</a></li>
-                                        <li><a class="dropdown-item" href="#" data-provider="osnative">OS Native</a>
+                                        <li><a class="dropdown-item" href="#" data-provider="webspeech">Web Speech</a></li>
+                                        <li><a class="dropdown-item" href="#" data-provider="osnative">OS Native (recommended)</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -103,7 +101,7 @@
                         </div>
 
                         <!-- Status (still flows normally) -->
-                        <small id="voice-status" class="text-muted d-block mt-2">Provider: Web Speech API | Status:
+                        <small id="voice-status" class="text-muted d-block mt-2">Provider: Web Speech | Status:
                             Idle</small>
 
 
@@ -131,6 +129,7 @@
     import { setupMobileSidebar } from '/static/js/mobile_ui.js';
     import { setupVoiceControl } from '/static/js/voice_control.js';
     import { blurButtonsOnMouseUp } from "/static/js/utils.js";
+
 
 
     document.addEventListener("DOMContentLoaded", () => {

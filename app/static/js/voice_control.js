@@ -30,9 +30,9 @@ export function setupVoiceControl({
 
 
     let currentProvider = "webspeech";
-    providerDropdown.textContent = "Provider: Web Speech API";
+    providerDropdown.textContent = "Provider: Web Speech";
     langDropdownBtn.textContent = "Language: English (US)";
-    let selectedLanguage = "en-US";
+    let selectedLanguage = "English (US)";
     let finalTranscript = ""; // buffer for confirmed text
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -56,7 +56,7 @@ export function setupVoiceControl({
         recognition.onstart = () => {
             finalTranscript = textarea.value.trim(); // store existing content
             recognition.lang = selectedLanguage;
-            status.textContent = `Provider: Web Speech API | 🎙 Listening (${selectedLanguage})...`;
+            status.textContent = `Provider: Web Speech | 🎙 Listening (${selectedLanguage})...`;
             textarea.focus();
         };
 
@@ -108,7 +108,6 @@ export function setupVoiceControl({
 
     providerItems.forEach(item => {
         item.addEventListener("click", (e) => {
-
             e.preventDefault();
             currentProvider = item.dataset.provider;
             providerDropdown.textContent = `Provider: ${item.textContent}`;
@@ -119,38 +118,29 @@ export function setupVoiceControl({
                 instructionBox.classList.add("d-none");
                 langDropdownBtn.textContent = `Language: ${selectedLanguage}`;
                 languageWrapper?.classList.remove("d-none");
-            } else if (currentProvider === "openai") {
-                instructionBox.classList.add("d-none");
-                langDropdownBtn.textContent = `Language: Automatic`;
-                languageWrapper?.classList.add("d-none");
             } else if (currentProvider === "osnative") {
                 const platform = navigator.userAgent.toLowerCase();
-                console.log(platform)
                 let tip = "💡 Use the mic button on your keyboard or mobile keyboard.";
                 if (platform.includes("win")) tip = "💡 Press <strong>Win + H</strong> for Windows dictation.";
-                else if (platform.includes('Mac')) tip = "💡 Press <strong>Fn</strong> twice to start macOS dictation. (Or your custom dictation shortcut)";
-
+                else if (platform.includes('mac')) tip = "💡 Press <strong>Fn</strong> twice to start macOS dictation.";
                 instructionBox.innerHTML = tip;
                 instructionBox.classList.remove("d-none");
-
                 langDropdownBtn.textContent = `Language: Device-specific`;
                 languageWrapper?.classList.add("d-none");
                 textarea?.focus();
-
             }
         });
     });
 
+
     micBtn.addEventListener("click", () => {
         if (currentProvider !== "webspeech") {
-            status.textContent = currentProvider === "openai"
-                ? "⚠️ OpenAI transcription coming soon."
-                : "ℹ️ Use OS-native voice input shortcut.";
+            status.textContent = "ℹ️ Use OS-native voice input shortcut.";
             return;
         }
 
         if (!recognition) {
-            status.textContent = "❌ Web Speech API not supported in this browser.";
+            status.textContent = "❌ Web Speech not supported in this browser.";
             return;
         }
 

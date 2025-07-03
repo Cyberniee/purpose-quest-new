@@ -29,6 +29,15 @@ class OpenAISettings:
     temperature: float = float(os.getenv("OPENAI_TEMPERATURE", 0.3))
     frequency_penalty: float = float(os.getenv("OPENAI_FREQUENCY_PENALTY", 0.99))
     presence_penalty: float = float(os.getenv("OPENAI_PRESENCE_PENALTY", 0.99))
+    
+    realtime_endpoint: str = os.getenv(
+        "OPENAI_REALTIME_ENDPOINT",
+        "wss://api.openai.com/v1/realtime"
+    )
+    transcription_model: str = os.getenv("OPENAI_TRANSCRIPTION_MODEL", "gpt-4o-transcribe")
+    transcription_language: str = os.getenv("OPENAI_TRANSCRIPTION_LANGUAGE", "en")
+    transcription_format: str = os.getenv("OPENAI_TRANSCRIPTION_FORMAT", "pcm16")
+    transcription_noise_reduction: str = os.getenv("OPENAI_TRANSCRIPTION_NOISE_REDUCTION", "near_field")
 
 @dataclass
 class StripeSettings:
