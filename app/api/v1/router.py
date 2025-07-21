@@ -11,6 +11,7 @@ from app.api.v1.views import router as views
 from app.api.v1.stripe import router as stripe_webhook_router
 from app.api.v1.account import router as account_router
 from app.api.v1.report import report_router
+from app.api.v1.whatsapp import router as whatsapp_router
 
 
 
@@ -28,5 +29,6 @@ api_router.include_router(views, tags=["views"])
 api_router.include_router(report_router, prefix="/report", tags=["report"])
 api_router.include_router(journal_router, prefix="/api/journal", tags=["journal"])
 api_router.include_router(user_router, prefix="/users", tags=["user_settings"])
+api_router.include_router(whatsapp_router, prefix="/wa", tags=["whatsapp"])
 
 
