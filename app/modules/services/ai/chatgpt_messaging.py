@@ -2,10 +2,9 @@ import asyncio, logging, aiofiles
 from app.config.openai_config import client
 from aiohttp import ClientError
 
-from .chatgpt_services import calc_tokens, is_over_token_limit, is_within_model_lim, update_token_usage
+from .chatgpt_services import calc_tokens, is_within_model_lim
 from app.config.general_config import OpenAISettings, SubscriptionVariables
 from app.utils.common_utils import async_exception_handler
-from app.db.db_operations.user import get_public_user_data
 from pydub.utils import mediainfo
 
 
@@ -48,7 +47,7 @@ async def retry_api_call(api_call, chat_messages, max_tokens, max_retry, model):
 
 # DEV DEV DEV!!!
 #main function
-async def send_message_to_chatgpt(message_content:dict, user_data:dict, subscription:str):
+async def send_message_to_chatgpt(message_content:dict, user_data:dict):
     user_id = user_data['id']
     chat_messages = message_content #str
     logger.info(f"chat messages: {chat_messages}")

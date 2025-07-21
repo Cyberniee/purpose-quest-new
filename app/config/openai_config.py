@@ -1,6 +1,6 @@
 from openai import AsyncOpenAI
-from app.config.general_config import Config
+from app.config.general_config import OpenAISettings
 
 client = AsyncOpenAI(
-    api_key = Config.openai.api_key
+    api_key = OpenAISettings.api_key
 )
