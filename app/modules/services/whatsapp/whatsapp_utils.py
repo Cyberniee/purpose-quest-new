@@ -107,8 +107,9 @@ async def is_old_msg(timestamp, message_id):
 
 # Helper function to check if a message or status update has been processed
 async def is_processed(wamid):
-    processed = await msg_is_processed(wamid)
-    return processed.data is not None and len(processed.data) > 0
+    processed = await msg_is_processed(wamid) # True or false
+
+    return processed
 
 async def handle_status_update(status_data):
     logger.info(f"status_data: {status_data}")

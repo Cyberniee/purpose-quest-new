@@ -89,7 +89,7 @@ async def msg_is_processed(wamid: str):
     Returns truthy if we've already stored a message with this WAMID.
     """
     resp = messages.select("wamid").eq("wamid", wamid).execute()
-    return validate_data_presence(resp)
+    return validate_data_presence(resp) # Bool, true or false
 
 
 @async_exception_handler
