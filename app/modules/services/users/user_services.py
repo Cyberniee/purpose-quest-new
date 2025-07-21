@@ -4,6 +4,8 @@ from uuid import UUID
 from app.config.auth_config import supabase_client as supabase
 from app.utils.common_utils import validate_data_presence
 from app.db.db_operations.subscriptions import get_consumption, update_consumption_data, update_sub_data
+from app.db.db_operations.whatsapp_accounts import link_wa_to_user
+from app.db.db_operations.user_settings import update_user_settings
 import uuid
 
 
@@ -189,3 +191,14 @@ async def create_whatsapp_link_token(user_id: str, expires_minutes: int = 30):
     if result.data:
         return result.data[0]
     return None
+
+
+async def link_wa_account_to_user(from_num: str, user_id: str):
+    if await link_wa_to_user(from_num=from_num, user_id=user_id):
+
+        data = {"wa_linked": True}
+        await update_user_settings(data, user_id=user_id)
+        return True
+    else:
+        logger.error(f"Failed to link WhatsApp number {from_num} to user ID {user_id}")
+        return False

@@ -8,7 +8,7 @@ from app.config.general_config import WaVariables
 from app.utils.common_utils import async_exception_handler, get_wa_headers, get_wa_ul_headers
 from app.db.db_operations.messages import msg_is_processed, insert_msg_status, update_msg_status, get_context_msg
 from app.db.db_operations.wa_link_tokens import get_user_id_from_token, update_token_validity
-from app.db.db_operations.user_settings import link_wa_to_user
+from app.modules.services.users.user_services import link_wa_account_to_user
 from app.utils.messaging_utils import wa_text_msg_handler
 
 logger = logging.getLogger(__name__)
@@ -170,15 +170,17 @@ async def link_new_phone_number(from_num: str, content: str):
     user_id = token["user_id"]
 
     # Step 3: Link phone number to user
-    resp = await link_wa_to_user(from_num=from_num, user_id=user_id)
+    resp = await link_wa_account_to_user(from_num=from_num, user_id=user_id)
 
     if resp:
         # Step 4: Mark token as consumed
         await update_token_validity(now=now, token=token_input)
 
         # Step 5: Confirm to user
-        logger.info
         await wa_text_msg_handler(from_num, "✅ Your number has been successfully linked to your account.", user_id=user_id)
+    else:
+        await wa_text_msg_handler(from_num, "❌ An error occured linking your phone number, please try again later.", user_id=user_id)
+
 
 
 
