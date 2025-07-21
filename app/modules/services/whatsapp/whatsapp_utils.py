@@ -154,7 +154,7 @@ async def link_new_phone_number(from_num: str, content: str):
     now = datetime.now(UTC)
 
     # Step 1: Look up token
-    token = get_user_id_from_token(token=token_input)
+    token = await get_user_id_from_token(token=token_input)
     
 
     if not token:
