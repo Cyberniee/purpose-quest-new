@@ -1,12 +1,22 @@
-import asyncio
+from datetime import datetime, date, timezone, timedelta
+from pytz import UTC
 
-async def test_ffmpeg():
-    proc = await asyncio.create_subprocess_exec(
-        'ffmpeg', '-version',
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
-    )
-    out, err = await proc.communicate()
-    print(out.decode())
+# def get_user_local_date(tz_offset_minutes: int):
+#     # Current UTC time
+#     utc_now = datetime.now()
+#     print(f"UTC now: {utc_now}")
 
-asyncio.run(test_ffmpeg())
+#     # Create a timezone offset
+#     user_timezone = timezone(timedelta(minutes=tz_offset_minutes))
+
+#     # Apply the offset
+#     user_local_datetime = utc_now.replace(tzinfo=timezone.utc).astimezone(user_timezone)
+
+#     # Return the date part
+#     return user_local_datetime.date()
+
+# print(get_user_local_date(tz_offset_minutes=-120))
+
+print(datetime.now(UTC).isoformat())
+
+print(timedelta(hours=12))

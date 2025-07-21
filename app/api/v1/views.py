@@ -417,7 +417,7 @@ async def auth_sign_in(request: Request, user: dict = Depends(get_current_user_o
 @router.get("/sign-up", response_class=HTMLResponse)
 async def sign_up_get(request: Request, user: dict = Depends(get_current_user_optional)):
     if user:
-        return RedirectResponse("/account/")
+        return RedirectResponse("/dashboard/")
     context = inject_common_context(request)
     return templates.TemplateResponse("user_register.html", context)
 

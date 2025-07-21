@@ -1,7 +1,9 @@
+import logging, datetime
+from uuid import UUID
 from app.config.auth_config import supabase_client as supabase
 from app.utils.common_utils import validate_data_presence
-from uuid import UUID
-import logging, datetime
+from app.db.db_operations.subscriptions import get_consumption, update_consumption_data, update_sub_data
+
 
 logger = logging.getLogger(__name__)
 
@@ -105,3 +107,69 @@ async def user_exists(sub: UUID = None, email: str = None) -> bool:
         logger.error("Either sub or email must be provided to check user existence")
         return False
     return user is not None
+
+
+async def update_consumption(duration: float, user_id: int, free: bool = False) -> None:
+    try:
+        consumption_data = {}
+        usage_resp = await get_consumption(user_id)
+        
+        if usage_resp is None:
+            logger.error(f"Failed to fetch usage data for user_id: {user_id}")
+            return
+        
+        usage: float = usage_resp['usage']
+        usage += duration
+        consumption_data['usage'] = usage
+
+        if free:
+            message_count = usage_resp.get('message_count', 0)
+            if duration != 0.00:
+                message_count += 1
+                consumption_data['message_count'] = message_count
+
+        await update_consumption_data(consumption_data=consumption_data, user_id=user_id)
+        logger.info(f"Updated consumption data for user_id: {user_id}")
+    
+    except Exception as e:
+        logger.error(f"Error in update_consumption: {e}")
+
+async def check_and_reset_usage(user_id):
+    consumption_data = await get_consumption(user_id)
+    last_reset_str = consumption_data['last_reset']
+    current_time = datetime.now()
+    just_reset = False
+
+    # If last_reset is None, set it to the current time
+    if last_reset_str is None:
+        last_reset = current_time
+        data = {'last_reset': last_reset.isoformat()}
+        await update_consumption_data(consumption_data=data, user_id=user_id)
+        return just_reset
+
+    # Convert last_reset_str to a datetime object
+    try:
+        last_reset = datetime.fromisoformat(last_reset_str)
+    except ValueError as e:
+        logger.error(f"Error parsing last_reset: {e}")
+        last_reset = current_time
+        data = {'last_reset': last_reset.isoformat()}
+        await update_consumption_data(consumption_data=data, user_id=user_id)
+        return just_reset
+
+    # Check if the current month is different from the last reset month
+    if current_time.year > last_reset.year or current_time.month > last_reset.month:
+        # Reset usage counter and update last_reset timestamp
+        data = {'message_count': 0, 'last_reset': current_time.isoformat()}
+        await update_consumption_data(consumption_data=data, user_id=user_id)
+        just_reset = True
+
+    return just_reset
+
+    
+async def deactivate_sub(subscription_del):
+    subscription_id = subscription_del["id"]
+    #change to centralized DB ops
+    await update_sub_data(data = {'active': False, 'sub_id':subscription_id})
+        
+    

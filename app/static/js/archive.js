@@ -62,7 +62,7 @@ function loadJournalEntry(dateKey) {
         wordCount.innerText = '';
 
         if (dateKey === todayKey) {
-            viewBtn.href = "/journal/new";
+            viewBtn.href = "/journal/today";
             viewBtn.textContent = "✍️ Start Writing";
             viewBtn.classList.remove("d-none");
         } else {

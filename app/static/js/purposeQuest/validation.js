@@ -96,7 +96,7 @@ export function submitForm() {
   })
   .then(data => {
     // On success, we redirect
-    window.location.href = '/account';
+    window.location.href = '/dashboard';
   })
   .catch(error => {
     console.error("There was a problem with the fetch operation:", error.message);

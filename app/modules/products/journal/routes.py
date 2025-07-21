@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 
 from app.modules.services.auth.auth_utils import AuthenticationUtils
-from app.utils.common_utils import format_entry_label, validate_data_presence, api_response
+from app.utils.common_utils import format_entry_label, validate_data_presence, api_response, get_user_local_date
 from app.config.auth_config import supabase_client as supabase
 from app.config.general_config import OpenAISettings
 
@@ -62,7 +62,8 @@ async def get_recent_journal_entries(
     current_user=Depends(AuthenticationUtils.get_authenticated_user),
 ):
     user_id = current_user["id"]
-    today_str = date.today().isoformat()
+    today_str = get_user_local_date(current_user['tz_offset'])  # get user local date
+    # today_str = date.today().isoformat() # takes server date, not user date
 
     # Fetch up to 3 most recent entries, including today
     res = (
