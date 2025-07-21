@@ -1,9 +1,9 @@
 import asyncio, logging, aiofiles
-from . import client
+from app.config.openai_config import client
 from aiohttp import ClientError
 
 from .chatgpt_services import calc_tokens, is_over_token_limit, is_within_model_lim, update_token_usage
-from app.settings import settings
+from app.config.general_config import OpenAISettings, SubscriptionVariables
 from app.utils.common_utils import async_exception_handler
 from app.db.db_operations.user import get_public_user_data
 from pydub.utils import mediainfo
@@ -18,7 +18,7 @@ async def fetch_gpt_response(chat_messages, max_tokens, model):
             messages=chat_messages,
             max_tokens=max_tokens,
             top_p=0.5,
-            temperature=settings.gpt_temperature,
+            temperature=OpenAISettings.gpt_temperature,
             frequency_penalty=0.99,
             presence_penalty=0.91
         )
@@ -52,7 +52,7 @@ async def send_message_to_chatgpt(message_content:dict, user_data:dict, subscrip
     user_id = user_data['id']
     chat_messages = message_content #str
     logger.info(f"chat messages: {chat_messages}")
-    max_tok = settings.chat_gpt_token_resp_lim
+    max_tok = OpenAISettings.chat_gpt_token_resp_lim
 
     # getting token stuff straight
     # over_token_lim, token_data, renewal = await is_over_token_limit(user_id)
@@ -62,16 +62,13 @@ async def send_message_to_chatgpt(message_content:dict, user_data:dict, subscrip
     if not within_model_lim:
         return "This message is a little too big for me (limit exceeded)..."
 
-    if subscription == "ultimate":
-        model = settings.ultimate_model
-    else:
-        model = settings.basic_model
+    model = OpenAISettings.model
 
     gpt_response, incoming_tokens = await retry_api_call(
         api_call=fetch_gpt_response, 
         chat_messages=chat_messages, 
         max_tokens=max_tok, 
-        max_retry=settings.max_retries,
+        max_retry=OpenAISettings.max_retries,
         model=model
     )
 
@@ -91,7 +88,7 @@ async def perform_stt(mp3_file_path, free:bool=False) -> dict:
         duration = float(audio_info.get('duration'))
         logger.info(f"Audio duration: {duration} seconds")
         
-        if free and duration >= settings.free_message_length_limit:
+        if free and duration >= SubscriptionVariables.free_message_length_limit:
             duration = 0.00
             message = 'Message is longer than 60 seconds. Please upgrade to transcribe longer messages. \n\nType \'*/upgrade*\' to see your options.'
             return {"status": "limit", "data": message, "duration": duration}

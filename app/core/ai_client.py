@@ -6,3 +6,5 @@ openai.api_key = config.openai.api_key
 
 def get_openai_client():
     return openai
+
+client = get_openai_client()
