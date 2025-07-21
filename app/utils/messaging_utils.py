@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 #sends text message and then logs to db
 #why is there no nudge? DEV DEV!!!
-async def wa_text_msg_handler(from_num: str, msg: str, user_id: int, tokens=0, qr_buttons=None):
+async def wa_text_msg_handler(from_num: str, msg: str, user_id: str, tokens=0, qr_buttons=None):
     try:
         max_chars = 4096
 
