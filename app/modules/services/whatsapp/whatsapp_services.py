@@ -36,7 +36,7 @@ async def handle_new_message(message_data):
         logger.info(f"User data retrieved: {user_data}")
 
         if user_data and isinstance(user_data, dict):
-            user_id = user_data.get('id')
+            user_id = user_data.get('user_id')
             if not user_id:
                 logger.error(f"User ID not found for phone: {from_num}") # check in the demo time if they actually reg correctly
                 return {'status': 'warning', 'message': 'user_id not found from phone number'}
@@ -67,7 +67,7 @@ async def handle_new_message(message_data):
 async def process_existing_user_message(user_data: dict, from_num: str, content, message_id, message_type, timestamp, audio_id=None, mime_type=None, context_msg_id=None):
     logger.info(f"we enter the loop with content: {content}")
     try:
-        user_id = user_data['id']
+        user_id = user_data['user_id']
         timestamp = datetime.fromtimestamp(int(timestamp))
 
         # Initialize default values
