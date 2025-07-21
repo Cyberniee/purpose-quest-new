@@ -31,9 +31,10 @@ async def handle_new_message(message_data):
             return {'status': 'warning', 'message': 'No content in message'}
 
         # User data retrieval and handling
+        logger.info(f"Retrieving user data with number: {from_num}")
         user_data = await get_user_from_number(phone_number=from_num)
         logger.info(f"User data retrieved: {user_data}")
-        
+
         if user_data and isinstance(user_data, dict):
             user_id = user_data.get('id')
             if not user_id:
