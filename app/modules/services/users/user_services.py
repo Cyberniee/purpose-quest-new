@@ -113,7 +113,7 @@ async def user_exists(sub: UUID = None, email: str = None) -> bool:
     return user is not None
 
 
-async def update_consumption(duration: float, user_id: int, free: bool = False) -> None:
+async def update_consumption(duration: float, user_id: str, free: bool = False) -> None:
     try:
         consumption_data = {}
         usage_resp = await get_consumption(user_id)

@@ -64,7 +64,7 @@ async def handle_new_message(message_data):
 
 
 # we essentially want to reply to the same source as that we got the msg from.
-async def process_existing_user_message(user_data: dict, from_num: int, content, message_id, message_type, timestamp, audio_id=None, mime_type=None, context_msg_id=None):
+async def process_existing_user_message(user_data: dict, from_num: str, content, message_id, message_type, timestamp, audio_id=None, mime_type=None, context_msg_id=None):
     logger.info(f"we enter the loop with content: {content}")
     try:
         user_id = user_data['id']

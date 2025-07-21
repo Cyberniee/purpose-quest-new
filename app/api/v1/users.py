@@ -144,7 +144,7 @@ async def fetch_phone_by_supabase_id(sub: str):
         logger.error(f"Error fetching phone_number for supabase id {sub}: {e}")
         return None
 
-async def fetch_phone_by_user_id(user_id: int):
+async def fetch_phone_by_user_id(user_id: str):
     try:
         resp = users.select('phone_number').eq('id', user_id).execute()
         if validate_data_presence(resp):
