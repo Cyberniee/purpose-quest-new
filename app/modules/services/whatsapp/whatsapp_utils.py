@@ -19,7 +19,7 @@ async def extract_message_details(message_data):
     mime_type = None
     context_msg_id = None
     message_id = message_data['id']
-    from_num = int(message_data['from'])
+    from_num = message_data['from']
     message_type = message_data['type']
     timestamp = message_data['timestamp']
     
