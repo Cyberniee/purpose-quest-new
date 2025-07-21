@@ -2,7 +2,7 @@
 from app.config.auth_config import supabase_client as supabase
 
 users = supabase.table('users')
-messages = supabase.table('messages')
+messages = supabase.table('whatsapp_messages')
 subs = supabase.table('subscriptions')
 prompts = supabase.table('prompts')
 whatsapp_accounts = supabase.table('whatsapp_accounts')
