@@ -7,7 +7,7 @@ async def get_user_id_from_token(token: str):
     resp = whatsapp_link_tokens.select("*").eq("token", token).eq('valid', True).limit(1).execute()
     
     if validate_data_presence(resp):
-        return resp.data
+        return resp.data[0]
     else:
         logger.info(f"No user found for token {token}")
         return None

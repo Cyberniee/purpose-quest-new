@@ -1,6 +1,6 @@
 # Define functions for each command
 import logging, httpx, os
-from pytz import UTC
+import pytz
 from datetime import datetime, timedelta
 
 from app.modules.services.whatsapp.whatsapp_messaging import send_whatsapp_message
@@ -8,7 +8,7 @@ from app.config.general_config import WaVariables
 from app.utils.common_utils import async_exception_handler, get_wa_headers, get_wa_ul_headers
 from app.db.db_operations.messages import msg_is_processed, insert_msg_status, update_msg_status, get_context_msg
 from app.db.db_operations.wa_link_tokens import get_user_id_from_token, update_token_validity
-from app.db.db_operations.user import link_wa_to_user
+from app.db.db_operations.user_settings import link_wa_to_user
 from app.utils.messaging_utils import wa_text_msg_handler
 
 logger = logging.getLogger(__name__)
@@ -151,7 +151,7 @@ async def link_new_phone_number(from_num: str, content: str):
         content (str): The message body (should contain the token).
     """
     token_input = content.strip()
-    now = datetime.now(UTC)
+    now = datetime.now(pytz.timezone('utc'))
 
     # Step 1: Look up token
     token = await get_user_id_from_token(token=token_input)
