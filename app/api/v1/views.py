@@ -386,7 +386,7 @@ async def cancel_page(request: Request, user: dict = Depends(get_current_user_op
     context = inject_common_context(request, user)
     return templates.TemplateResponse("terms_of_service.html", context)
 
-@router.get("/privacy", response_class=HTMLResponse)
+@router.get("/privacy-policy", response_class=HTMLResponse)
 async def cancel_page(request: Request, user: dict = Depends(get_current_user_optional)):
     context = inject_common_context(request, user)
     return templates.TemplateResponse("privacy_policy.html", context)
