@@ -94,5 +94,5 @@ async def generate_wa_token(current_user=Depends(AuthenticationUtils.get_authent
     return {
         "token": token_data["token"],
         "expires_at": token_data["expires_at"],
-        "wa_link": f"https://wa.me/31612345678?text={token_data['token']}"  # Replace with real number
+        "wa_link": f"https://wa.me/31681993746?text={token_data['token']}"  # Replace with real number
     }
