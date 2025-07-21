@@ -76,7 +76,7 @@ async def process_existing_user_message(user_data: dict, from_num: str, content,
         reply_content = None
         duration = 0.00
         entry_id = None
-        
+
         subscriptions = user_data.get('users', {}).get('subscriptions', [])
 
         if not subscriptions:
@@ -143,7 +143,7 @@ async def process_existing_user_message(user_data: dict, from_num: str, content,
 
         else:
             # If the content is not a list, we want to add the full content to the user entry for today.
-            status, entry_id = await log_entry_from_whatsapp()
+            status, entry_id = await log_entry_from_whatsapp(user_id=user_id, user_offset=user_data['user_settings'][0]['tz_offset'], content=content)
             if not status:
                 logger.error(f"Failed to log entry for user {user_id} with content: {content}")
                 error_occured = True
