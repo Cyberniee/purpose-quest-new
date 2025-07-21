@@ -31,7 +31,7 @@ async def handle_new_message(message_data):
             return {'status': 'warning', 'message': 'No content in message'}
 
         # User data retrieval and handling
-        user_data = await get_user_from_number(number=from_num)
+        user_data = await get_user_from_number(phone_number=from_num)
 
         if user_data:
             user_id = user_data.get('id')
