@@ -10,76 +10,80 @@ logger = logging.getLogger(__name__)
 # DEV CHANGED >> TEST ELABORATELY!!!
 
 async def send_whatsapp_message(to_number: str, message: str, qr_buttons: list = None):
-    if not to_number or not message:
-        logger.error(f"message or number were not provided in the right format: {message}, {to_number}")
-        return None
+    try: 
+        if not to_number or not message:
+            logger.error(f"message or number were not provided in the right format: {message}, {to_number}")
+            return None
 
-    url = WaVariables.url_wa
-    headers = get_wa_headers()
+        url = WaVariables.url_wa
+        headers = get_wa_headers()
 
-    if qr_buttons:
-        buttons = []
-        for button in qr_buttons:
-            if "url" in button:
-                buttons.append({
+        if qr_buttons:
+            buttons = []
+            for button in qr_buttons:
+                if "url" in button:
+                    buttons.append({
+                        "type": "button",
+                        "sub_type": "url",
+                        "url": button["url"],
+                        "title": button["title"]
+                    })
+                else:
+                    buttons.append({
+                        "type": "reply",
+                        "reply": {
+                            "id": button['id'],
+                            "title": button['title']
+                        }
+                    })
+
+            data = {
+                "messaging_product": "whatsapp",
+                "to": to_number,
+                "type": "interactive",
+                "recipient_type": "individual",
+                "interactive": {
                     "type": "button",
-                    "sub_type": "url",
-                    "url": button["url"],
-                    "title": button["title"]
-                })
-            else:
-                buttons.append({
-                    "type": "reply",
-                    "reply": {
-                        "id": button['id'],
-                        "title": button['title']
+                    "body": {
+                        "text": message
+                    },
+                    "action": {
+                        "buttons": buttons
                     }
-                })
-
-        data = {
-            "messaging_product": "whatsapp",
-            "to": to_number,
-            "type": "interactive",
-            "recipient_type": "individual",
-            "interactive": {
-                "type": "button",
-                "body": {
-                    "text": message
-                },
-                "action": {
-                    "buttons": buttons
                 }
             }
-        }
-    else:
-        data = {
-            "messaging_product": "whatsapp",
-            "to": to_number,
-            "type": "text",
-            "text": {
-                "preview_url": False,
-                "body": message
+        else:
+            data = {
+                "messaging_product": "whatsapp",
+                "to": to_number,
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": message
+                }
             }
-        }
 
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=headers, json=data) as response:
-                    if response.status == 200:
-                        return await response.json()
-                    else:
-                        logger.error(f"Failed to send message: response status = {response.status}, response = {response}")
-                        return None
-        except aiohttp.ClientConnectorError as e:
-            logger.error(f"Connection Error on attempt {attempt + 1}: {str(e)}")
-            if attempt < max_retries - 1:
-                backoff_time = 2 ** attempt
-                await asyncio.sleep(backoff_time)
-            else:
-                logger.error("Max retries reached. Giving up.")
-                return None
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(url, headers=headers, json=data) as response:
+                        if response.status == 200:
+                            return await response.json()
+                        else:
+                            logger.error(f"Failed to send message: response status = {response.status}, response = {response}")
+                            return None
+            except aiohttp.ClientConnectorError as e:
+                logger.error(f"Connection Error on attempt {attempt + 1}: {str(e)}")
+                if attempt < max_retries - 1:
+                    backoff_time = 2 ** attempt
+                    await asyncio.sleep(backoff_time)
+                else:
+                    logger.error("Max retries reached. Giving up.")
+                    return None
+    except Exception as e:
+        logger.error(f"Error sending WhatsApp message: {e}")
+        return None
 
 async def send_template_message(to_number: str, template_name: str, link_vars=[], text_vars=[], lang_code="en"):
     # logger.info(f"Trying to send template message: {to_number}, {template_name}, tv: {text_vars}, lv: {link_vars}")
