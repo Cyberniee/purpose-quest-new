@@ -32,8 +32,9 @@ async def handle_new_message(message_data):
 
         # User data retrieval and handling
         user_data = await get_user_from_number(phone_number=from_num)
-
-        if user_data:
+        logger.info(f"User data retrieved: {user_data}")
+        
+        if user_data and isinstance(user_data, dict):
             user_id = user_data.get('id')
             if not user_id:
                 logger.error(f"User ID not found for phone: {from_num}") # check in the demo time if they actually reg correctly
