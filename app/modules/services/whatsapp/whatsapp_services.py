@@ -93,7 +93,7 @@ async def process_existing_user_message(user_data: dict, from_num: str, content,
         if audio_id:
             just_reset = await check_and_reset_usage(user_id) if free else False
 
-            if user_data['subscriptions'][0]['message_count'] >= SubscriptionVariables.free_message_count and free and not just_reset:
+            if user_data['users']['subscriptions'][0]['message_count'] >= SubscriptionVariables.free_message_count and free and not just_reset:
                 message = 'You\'ve reached the free limit for this month. If you want to upgrade and transcribe longer messages, upgrade your subscription in the Purpose Quest dashboard.'
                 await wa_text_msg_handler(user_id=user_id, msg=message, from_num=from_num)
                 return False, None
