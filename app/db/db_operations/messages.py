@@ -24,7 +24,7 @@ async def insert_msg_status(message_id: str, status: str):
       - role:         default to 'inbound'
       - source:       will default in the DB to 'whatsapp'
     """
-    await messages.insert({
+    messages.insert({
         "wamid": message_id,
         "status": status,
         "message_type": "text",
@@ -75,7 +75,7 @@ async def insert_message(
         if source:
             payload["source"] = source
 
-        insert_msg_resp = await messages.insert(payload).execute()
+        insert_msg_resp = messages.insert(payload).execute()
 
         # check for errors (Supabase-style)
         if insert_msg_resp.get("error"):
@@ -88,7 +88,7 @@ async def msg_is_processed(wamid: str):
     """
     Returns truthy if we've already stored a message with this WAMID.
     """
-    resp = await messages.select("wamid").eq("wamid", wamid).execute()
+    resp = messages.select("wamid").eq("wamid", wamid).execute()
     return validate_data_presence(resp)
 
 
@@ -98,7 +98,7 @@ async def get_last_stt_msg(user_id: str):
     Fetch the most recent 'audio' message_content for this user.
     Decrypts before returning.
     """
-    resp = await messages\
+    resp = messages\
         .select("message_content")\
         .eq("user_id", user_id)\
         .eq("message_type", "audio")\
@@ -118,7 +118,7 @@ async def get_context_msg(context_msg_id: str):
     """
     Fetch and decrypt the single message with this WAMID.
     """
-    resp = await messages\
+    resp = messages\
         .select("message_content")\
         .eq("wamid", context_msg_id)\
         .limit(1)\
