@@ -5,7 +5,7 @@ from app.modules.services.ai.chatgpt_utils import transcribe_audio
 from app.modules.services.users.user_services import update_consumption, check_and_reset_usage
 from app.modules.services.journal.journal_services import log_entry_from_whatsapp
 from app.config.general_config import SubscriptionVariables
-from app.utils.messaging_utils import wa_text_msg_handler, wa_template_msg_handler
+from app.utils.messaging_utils import wa_text_msg_handler
 from app.db.db_operations.messages import update_msg_status, insert_message
 from app.db.db_operations.whatsapp_accounts import get_user_from_number
 from .whatsapp_utils import is_old_msg, process_command, extract_message_details, cleanup_audio_files

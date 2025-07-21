@@ -7,6 +7,10 @@ export async function loadSettings() {
     document.getElementById('last-name').value = data.last_name || "";
     document.getElementById('email').value = data.email || "";
 
+    if (data.whatsapp_linked) {
+        document.getElementById("wa-link-status").innerHTML = `<span class="text-success">✅ Linked</span>`;
+    }
+
     // Notifications
     document.getElementById('notif-daily').checked = data.notifications.daily;
     document.getElementById('notif-ai-insights').checked = data.notifications.ai_insights;
@@ -70,3 +74,24 @@ export async function saveAllSettings() {
         }, 3000);
     }
 }
+
+export function setupWhatsappLinking() {
+    const btn = document.getElementById("link-whatsapp");
+    if (!btn) return;
+
+    btn.addEventListener("click", async () => {
+        try {
+            const res = await fetch("/users/settings/link-token", { method: "POST" });
+            const data = await res.json();
+
+            document.getElementById("wa-link-url").href = data.wa_link;
+            document.getElementById("wa-link-url").textContent = data.wa_link;
+            document.getElementById("wa-token-display").textContent = data.token;
+            document.getElementById("wa-link-container").classList.remove("d-none");
+        } catch (err) {
+            console.error("Failed to generate WhatsApp token", err);
+            alert("❌ Could not generate token");
+        }
+    });
+}
+

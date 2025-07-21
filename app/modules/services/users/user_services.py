@@ -1,8 +1,10 @@
-import logging, datetime
+import logging, pytz
+from datetime import datetime, timedelta
 from uuid import UUID
 from app.config.auth_config import supabase_client as supabase
 from app.utils.common_utils import validate_data_presence
 from app.db.db_operations.subscriptions import get_consumption, update_consumption_data, update_sub_data
+import uuid
 
 
 logger = logging.getLogger(__name__)
@@ -172,4 +174,18 @@ async def deactivate_sub(subscription_del):
     #change to centralized DB ops
     await update_sub_data(data = {'active': False, 'sub_id':subscription_id})
         
-    
+
+async def create_whatsapp_link_token(user_id: str, expires_minutes: int = 30):
+    token_str = str(uuid.uuid4()).split("-")[0]
+    now = datetime.now(pytz.timezone('utc'))
+    expiry = now + timedelta(minutes=expires_minutes)
+
+    result = supabase.table("whatsapp_link_tokens").insert({
+        "user_id": user_id,
+        "token": token_str,
+        "expires_at": expiry.isoformat()
+    }).execute()
+
+    if result.data:
+        return result.data[0]
+    return None

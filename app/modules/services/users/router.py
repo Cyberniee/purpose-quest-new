@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.config.auth_config import supabase_client as supabase
 from app.modules.services.auth.auth_utils import AuthenticationUtils
+from app.modules.services.users.user_services import create_whatsapp_link_token
 from app.utils.common_utils import validate_data_presence
 from datetime import datetime
 
@@ -22,6 +23,7 @@ async def get_settings(current_user=Depends(AuthenticationUtils.get_authenticate
         "first_name": s.get("first_name", ""),
         "last_name": s.get("last_name", ""),
         "email": current_user.get("email"),
+        "whatsapp_linked": s.get("wa_linked", False),
         "notifications": {
             "daily": s.get("notif_daily", False),
             "ai_insights": s.get("notif_ai_insights", False),
@@ -82,3 +84,15 @@ async def update_preferences(data: dict, current_user=Depends(AuthenticationUtil
         raise HTTPException(status_code=400, detail="Failed to update preferences")
 
     return {"status": "success"}
+
+@router.post("/settings/link-token")
+async def generate_wa_token(current_user=Depends(AuthenticationUtils.get_authenticated_user)):
+    token_data = await create_whatsapp_link_token(current_user["id"])
+    if not token_data:
+        raise HTTPException(status_code=500, detail="Token generation failed")
+
+    return {
+        "token": token_data["token"],
+        "expires_at": token_data["expires_at"],
+        "wa_link": f"https://wa.me/31612345678?text={token_data['token']}"  # Replace with real number
+    }
