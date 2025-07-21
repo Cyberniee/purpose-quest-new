@@ -9,6 +9,9 @@ export async function loadSettings() {
 
     if (data.whatsapp_linked) {
         document.getElementById("wa-link-status").innerHTML = `<span class="text-success">✅ Linked</span>`;
+        const btn = document.getElementById("link-whatsapp");
+        btn.classList.add("d-none");
+
     }
 
     // Notifications

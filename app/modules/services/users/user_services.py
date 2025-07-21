@@ -156,19 +156,22 @@ async def update_consumption(duration: float, user_id: str, free: bool = False) 
 async def check_and_reset_usage(user_id):
     consumption_data = await get_consumption(user_id)
     last_reset_str = consumption_data['last_reset']
-    current_time = datetime.now()
+    current_time = datetime.now(pytz.UTC)  # timezone-aware UTC
     just_reset = False
 
-    # If last_reset is None, set it to the current time
     if last_reset_str is None:
         last_reset = current_time
         data = {'last_reset': last_reset.isoformat()}
         await update_consumption_data(consumption_data=data, user_id=user_id)
         return just_reset
 
-    # Convert last_reset_str to a datetime object
     try:
         last_reset = datetime.fromisoformat(last_reset_str)
+
+        # Ensure it's timezone-aware (should be if from Supabase, but just in case)
+        if last_reset.tzinfo is None:
+            last_reset = last_reset.replace(tzinfo=pytz.UTC)
+
     except ValueError as e:
         logger.error(f"Error parsing last_reset: {e}")
         last_reset = current_time
@@ -176,9 +179,7 @@ async def check_and_reset_usage(user_id):
         await update_consumption_data(consumption_data=data, user_id=user_id)
         return just_reset
 
-    # Check if the current month is different from the last reset month
     if current_time.year > last_reset.year or current_time.month > last_reset.month:
-        # Reset usage counter and update last_reset timestamp
         data = {'message_count': 0, 'last_reset': current_time.isoformat()}
         await update_consumption_data(consumption_data=data, user_id=user_id)
         just_reset = True
