@@ -17,6 +17,7 @@ async def send_whatsapp_message(to_number: str, message: str, qr_buttons: list =
 
         url = WaVariables.url_wa
         headers = get_wa_headers()
+        logger.info(f"headers: {headers}")
 
         if qr_buttons:
             buttons = []

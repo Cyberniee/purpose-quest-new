@@ -21,8 +21,11 @@ def api_response(data=None, status="ok", message=None, code=200):
     })
 
 def get_wa_headers():
+    token = os.getenv("WHATSAPP_TOKEN")
+    if not isinstance(token, str):
+        raise ValueError("WHATSAPP_TOKEN must be set and must be a string")
     return {
-        "Authorization": f"Bearer {WaVariables.access_token_wa}",
+        "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
     }
 
