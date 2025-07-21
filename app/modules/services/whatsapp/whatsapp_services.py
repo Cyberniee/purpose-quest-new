@@ -135,7 +135,7 @@ async def process_existing_user_message(user_data: dict, from_num: str, content,
             # If the content is a list, send each chunk as a separate message
             for chunk in content:
                 # here we want to make sure the chunks are added to the users entry for today. Appended or inserted.
-                status = await log_entry_from_whatsapp(user_id=user_id, user_offset=user_data['user_settings'][0]['tz_offset'], content=chunk)
+                status = await log_entry_from_whatsapp(user_id=user_id, user_offset=user_data['users']['user_settings']['tz_offset'], content=chunk)
                 if not status:
                     logger.error(f"Failed to log entry for user {user_id} with content: {chunk}")
                     error_occured = True
@@ -143,7 +143,7 @@ async def process_existing_user_message(user_data: dict, from_num: str, content,
 
         else:
             # If the content is not a list, we want to add the full content to the user entry for today.
-            status, entry_id = await log_entry_from_whatsapp(user_id=user_id, user_offset=user_data['user_settings'][0]['tz_offset'], content=content)
+            status, entry_id = await log_entry_from_whatsapp(user_id=user_id, user_offset=user_data['users']['user_settings']['tz_offset'], content=content)
             if not status:
                 logger.error(f"Failed to log entry for user {user_id} with content: {content}")
                 error_occured = True
