@@ -14,7 +14,7 @@ async def get_user_id_from_token(token: str):
     
 @async_exception_handler
 async def update_token_validity(now, token:str):
-    resp = whatsapp_link_tokens.update({ "consumed_at": now }).eq("id", token).execute()
+    resp = whatsapp_link_tokens.update({ "consumed_at": now, "valid": False }).eq("id", token).execute()
     if not validate_data_presence(resp):
         logger.error(f"Failed to update token validity for {token}")
         return False

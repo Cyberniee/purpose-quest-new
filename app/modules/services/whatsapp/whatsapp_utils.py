@@ -123,7 +123,7 @@ async def handle_status_update(status_data):
         await update_msg_status(message_id=status_id, status=status)
     else:
         await insert_msg_status(message_id=status_id, status=status)
-        logger.warning(f"inserting another empty haha... message: {status_data}")
+        logger.warning(f"inserting another empty message: {status_data}")
 
 async def get_media_url(media_id):
     headers = get_wa_headers()
@@ -143,44 +143,41 @@ async def get_media_url(media_id):
 
 @async_exception_handler
 async def link_new_phone_number(from_num: str, content: str):
-    """
-    Link a new phone number to a user if the provided token is valid.
-
-    Args:
-        from_num (str): The incoming WhatsApp phone number.
-        content (str): The message body (should contain the token).
-    """
     token_input = content.strip()
-    now = datetime.now(pytz.timezone('utc'))
+    now_utc = datetime.now(pytz.UTC)  # timezone-aware UTC datetime
 
-    # Step 1: Look up token
     token = await get_user_id_from_token(token=token_input)
-    
 
     if not token:
-        # await send_whatsapp_message(from_num, "❌ Invalid token. Please request a new link token from your dashboard.")
         await wa_text_msg_handler(from_num, "❌ Invalid token. Please request a new link token from your dashboard.", user_id=None)
         return
 
+    expires_at = token.get("expires_at")
 
-    if datetime.fromisoformat(token["expires_at"]) < now:
+    # Convert to datetime if it’s a string
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+
+    # Ensure it’s timezone-aware (e.g., from Supabase TIMESTAMPTZ)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=pytz.UTC)
+
+    # Compare in UTC
+    if expires_at < now_utc:
         await wa_text_msg_handler(from_num, "⏰ This token has expired. Please generate a new one in your dashboard.", user_id=None)
         return
 
     user_id = token["user_id"]
-
-    # Step 3: Link phone number to user
     resp = await link_wa_account_to_user(from_num=from_num, user_id=user_id)
 
     if resp:
-        # Step 4: Mark token as consumed
-        await update_token_validity(now=now, token=token_input)
+        # Convert `now_utc` to string format for Supabase
+        now_str = now_utc.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+        await update_token_validity(now=now_str, token=token_input)
 
-        # Step 5: Confirm to user
         await wa_text_msg_handler(from_num, "✅ Your number has been successfully linked to your account.", user_id=user_id)
     else:
-        await wa_text_msg_handler(from_num, "❌ An error occured linking your phone number, please try again later.", user_id=user_id)
-
+        await wa_text_msg_handler(from_num, "❌ An error occurred linking your phone number, please try again later.", user_id=user_id)
 
 
 

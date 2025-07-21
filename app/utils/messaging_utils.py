@@ -27,7 +27,7 @@ async def wa_text_msg_handler(from_num: str, msg: str, user_id: str, tokens=0, q
             logger.info(f"Sending WhatsApp message to {from_num} {type(from_num)}: {chunk}, {type(chunk)}")
             json_resp_wam = await send_whatsapp_message(to_number=from_num, message=chunk, qr_buttons=qr_buttons)
             message_id = json_resp_wam.get('messages', [{}])[0].get('id', 'unknown')
-            await insert_message(user_id=user_id, message_id=message_id, msg_content=chunk, incoming_tokens=tokens, type="text", role="assistant", status="sent")
+            await insert_message(user_id=user_id, message_id=message_id, msg_content=chunk, incoming_tokens=tokens, msg_type="text", role="assistant", status="sent")
 
         return {"status": "success"}
     except Exception as e:

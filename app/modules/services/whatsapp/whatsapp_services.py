@@ -159,4 +159,4 @@ async def process_existing_user_message(user_data: dict, from_num: str, content,
 
     finally:
         # Insert incoming message with updated or default values
-        await insert_message(user_id=user_id, message_id=message_id, msg_content=content, incoming_tokens = 0, role='user', status='received', type=message_type, media_id=audio_id)
+        await insert_message(user_id=user_id, message_id=message_id, msg_content=content, incoming_tokens = 0, role='user', status='received', msg_type=message_type, media_id=audio_id)
