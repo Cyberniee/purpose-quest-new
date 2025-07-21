@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 # DEV CHANGED >> TEST ELABORATELY!!!
 
-async def send_whatsapp_message(to_number: int, message: str, qr_buttons: list = None):
+async def send_whatsapp_message(to_number: str, message: str, qr_buttons: list = None):
     if not to_number or not message:
         logger.error(f"message or number were not provided in the right format: {message}, {to_number}")
         return None
@@ -38,7 +38,7 @@ async def send_whatsapp_message(to_number: int, message: str, qr_buttons: list =
 
         data = {
             "messaging_product": "whatsapp",
-            "to": str(to_number),
+            "to": to_number,
             "type": "interactive",
             "recipient_type": "individual",
             "interactive": {
@@ -54,7 +54,7 @@ async def send_whatsapp_message(to_number: int, message: str, qr_buttons: list =
     else:
         data = {
             "messaging_product": "whatsapp",
-            "to": str(to_number),
+            "to": to_number,
             "type": "text",
             "text": {
                 "preview_url": False,
@@ -81,7 +81,7 @@ async def send_whatsapp_message(to_number: int, message: str, qr_buttons: list =
                 logger.error("Max retries reached. Giving up.")
                 return None
 
-async def send_template_message(to_number: int, template_name: str, link_vars=[], text_vars=[], lang_code="en"):
+async def send_template_message(to_number: str, template_name: str, link_vars=[], text_vars=[], lang_code="en"):
     # logger.info(f"Trying to send template message: {to_number}, {template_name}, tv: {text_vars}, lv: {link_vars}")
     if not to_number or not template_name:
         logger.error(f"Template or number were not provided in the right format: {template_name}, {to_number}")
