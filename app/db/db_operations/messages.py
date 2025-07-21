@@ -5,7 +5,7 @@ async def update_msg_status(message_id: str, status: str, entry_id: str = None):
     Try to update the status on an existing message. If no row was updated,
     fall back to inserting a minimal status‐only row (with defaults).
     """
-    resp = await messages.update({
+    resp = messages.update({
         "status": status,
         "entry_id":entry_id
     }).eq("wamid", message_id).execute()
