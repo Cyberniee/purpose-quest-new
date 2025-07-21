@@ -181,7 +181,7 @@
                             document.getElementById('successMessage').innerText = data.message;
                             document.getElementById('successMessage').style.display = 'block';
                             if (data.message === "You already have an account with us, so we've signed you in.") {
-                                setTimeout(() => { window.location.href = '/account'; }, 500);
+                                setTimeout(() => { window.location.href = '/dashboard'; }, 500);
                             }
                         } else {
                             document.getElementById('errorMessage').innerText = data.message;
@@ -201,7 +201,7 @@
             validateRegistrationFormAndSubmit('registrationForm', (data) => {
                 document.getElementById('successMessage').innerText = data.message;
                 document.getElementById('successMessage').style.display = 'block';
-                setTimeout(() => { window.location.href = '/account'; }, 500);
+                setTimeout(() => { window.location.href = '/dashboard'; }, 500);
             }, (errorMessage) => {
                 document.getElementById('errorMessage').innerText = errorMessage;
                 document.getElementById('errorMessage').style.display = 'block';

@@ -137,7 +137,7 @@
               document.getElementById('successMessage').innerText = data.message;
               document.getElementById('successMessage').style.display = 'block';
               setTimeout(() => {
-                window.location.href = '/account';
+                window.location.href = '/dashboard';
               }, 500); // Redirect after 0.5 seconds
             } else {
               const errorElement = document.getElementById('errorMessage');
@@ -165,7 +165,7 @@
       validateFormAndSubmit('loginForm', (data) => {
         document.getElementById('successMessage').innerText = data.message;
         document.getElementById('successMessage').style.display = 'block';
-        setTimeout(() => { window.location.href = '/account'; }, 500);
+        setTimeout(() => { window.location.href = '/dashboard'; }, 500);
       }, (errorMessage) => {
         document.getElementById('errorMessage').innerText = errorMessage;
         document.getElementById('errorMessage').style.display = 'block';

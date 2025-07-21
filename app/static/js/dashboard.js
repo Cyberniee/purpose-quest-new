@@ -13,7 +13,16 @@ export async function initializeJournalDashboard() {
         const dateSet = new Set(dates);
 
         // Total entries
-        const totalEntries = dates.length;
+        const now = new Date();
+        const thisMonth = now.getMonth();
+        const thisYear = now.getFullYear();
+
+        const datesThisMonth = dates.filter(dateStr => {
+            const d = new Date(dateStr);
+            return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+        });
+
+        const totalEntries = datesThisMonth.length;
         console.log("entries etc:", totalEntries, dateSet);
 
         // Calculate streak
