@@ -58,6 +58,21 @@ async def create_user(sub: UUID, email: str, name: str = "") -> dict:
     except Exception as e:
         logger.error(f"something went wrong creating the user settings: {e}")
 
+    try:
+        subscription_response = supabase.table("subscriptions").insert(
+            {
+                "user_id": user_create_response.data[0]['id'],
+                "subscription": "free",
+                "active": True,
+                "start_date": datetime.now().isoformat()
+            }
+        )
+        if not validate_data_presence(subscription_response):
+            logger.error(f'an error occured inserting user subscription')
+    
+    except Exception as e:
+        logger.error(f"something went wrong creating the user subscription: {e}")
+
 
 async def delete_user(user_id: UUID) -> None:
     try:

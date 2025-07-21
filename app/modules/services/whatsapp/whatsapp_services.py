@@ -76,7 +76,17 @@ async def process_existing_user_message(user_data: dict, from_num: str, content,
         reply_content = None
         duration = 0.00
         entry_id = None
-        free = True if user_data['subscriptions'][0]['subscription'].lower() == 'free' or not user_data['subscriptions'][0]['active'] else False
+        
+        subscriptions = user_data.get('users', {}).get('subscriptions', [])
+
+        if not subscriptions:
+            free = True
+        else:
+            sub = subscriptions[0]
+            sub_type = sub.get('subscription', '').lower()
+            is_active = sub.get('active', False)
+            free = sub_type == 'free' or not is_active
+
         
 
         # here we will add the if audio_id bla bla, to get to the content part. If media in, we choose for media out.
