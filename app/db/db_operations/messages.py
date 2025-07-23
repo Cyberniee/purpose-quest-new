@@ -78,8 +78,8 @@ async def insert_message(
         insert_msg_resp = messages.insert(payload).execute()
 
         # check for errors (Supabase-style)
-        if insert_msg_resp.get("error"):
-            logger.error(f"Issue inserting message into DB: {insert_msg_resp}")
+        if 'message' in insert_msg_resp:
+            logger.error(f"we have an issue inserting reply message to db: {insert_msg_resp}")
     except Exception as e:
         logger.error(f"Error inserting message into DB: {e}")
 
