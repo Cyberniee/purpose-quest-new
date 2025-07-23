@@ -30,7 +30,7 @@ async def transcribe_audio(audio_id: str, message_id: str, mime_type: str = None
     mp3_in_file_path = conversion_result['file_path']
 
     # Perform speech-to-text
-    transcribed_message_resp = await perform_stt(mp3_in_file_path, user_data['subscriptions'][0]['subscription'] == 'free')
+    transcribed_message_resp = await perform_stt(mp3_in_file_path, user_data['users']['subscriptions'][0]['subscription'] == 'free')
     if transcribed_message_resp['status'] == "error":
         return {'status': 'error'}
     
