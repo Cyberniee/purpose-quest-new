@@ -9,9 +9,11 @@ from app.api.v1.router import api_router
 from app.config import config
 from app.middleware.user_cookie_injector import UserDataCookieMiddleware
 from app.middleware.auth_redirect_middleware import AuthRedirectMiddleware
+from app.utils.common_utils import create_dirs
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG if config.project.log_level == "DEBUG" else logging.INFO)
+create_dirs()
 
 app = FastAPI(
     title=config.project.project_name,

@@ -28,7 +28,7 @@ async def insert_msg_status(message_id: str, status: str):
         "wamid": message_id,
         "status": status,
         "message_type": "text",
-        "role": "inbound"
+        "role": "server"
     }).execute()
 
 
