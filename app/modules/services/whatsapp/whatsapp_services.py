@@ -102,8 +102,12 @@ async def process_existing_user_message(user_data: dict, from_num: str, content,
             await wa_text_msg_handler(user_id=user_id, msg=message, from_num=from_num)
 
             # gotta transcribe here.
-            transcribe_response = await transcribe_audio(audio_id=audio_id, message_id=message_id, mime_type=mime_type, user_data=user_data)
-            
+            try:
+                transcribe_response = await transcribe_audio(audio_id=audio_id, message_id=message_id, mime_type=mime_type, user_data=user_data)
+            except Exception as e:
+                logger.error(f"Error during audio transcription: {e}")
+                return 'error', None
+
             if transcribe_response['status'] == "error":
                 content = 'something went wrong on our side, pelase make sure the file is <20mb, <20 minutes, and is an audio file (no video file). \n\nIf the issue persists, please contact info@voice-vault.com and we\'ll help you out.'
             
