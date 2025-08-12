@@ -9,8 +9,12 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
-from app.config.auth_config import AuthSettings
-from app.config.auth_config import supabase_client as supabase
+from app.config.auth_config import (
+    AuthSettings,
+    supabase_client as supabase,
+    set_supabase_access_token,
+    set_supabase_service_role,
+)
 from app.utils.common_utils import validate_data_presence
 from app.utils.helpers import parse_user_data_cookie
 
@@ -44,6 +48,8 @@ class AuthenticationUtils:
     @staticmethod
     def get_authenticated_user(request: Request, require_auth: bool = True, allow_cookie: bool = True) -> dict | None:
         access_token = request.cookies.get("access_token")
+        set_supabase_service_role(False)
+        set_supabase_access_token(access_token)
         if not access_token:
             if require_auth:
                 raise HTTPException(status_code=401, detail="Missing access token")
@@ -52,6 +58,7 @@ class AuthenticationUtils:
 
         decoded_token = AuthenticationUtils.decode_and_validate_jwt(access_token)
         if not decoded_token:
+            set_supabase_access_token(None)
             if require_auth:
                 raise HTTPException(status_code=401, detail="Invalid or expired token")
             logger.info("Invalid or expired access token")

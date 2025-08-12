@@ -8,8 +8,12 @@ from pydantic import BaseModel
 from fastapi import APIRouter, Request, Response, HTTPException, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
 
-from app.config.auth_config import supabase_client as supabase
-from app.config.auth_config import AuthSettings
+from app.config.auth_config import (
+    supabase_client as supabase,
+    AuthSettings,
+    set_supabase_access_token,
+    set_supabase_service_role,
+)
 from app.modules.services.users.user_services import get_user_by_supabase_auth_id
 from app.utils.common_utils import detailed_exception_handler
 from app.modules.services.auth.auth_utils import AuthenticationUtils
@@ -121,7 +125,9 @@ async def sign_in(request: Request, response: Response):
                 "status": "error",
                 "message": "Invalid token received. Please try again."
             })
-        
+
+        set_supabase_service_role(False)
+        set_supabase_access_token(res.session.access_token)
         user = await get_user_by_supabase_auth_id(decoded_token["sub"])
         print(f"USER: user data from signin: {user}")
         
