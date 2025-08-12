@@ -12,7 +12,7 @@ from app.modules.services.auth.auth_utils import AuthenticationUtils
 from app.utils.common_utils import format_entry_label, validate_data_presence, api_response, get_user_local_date
 from app.config.auth_config import supabase_client as supabase
 from app.config.general_config import OpenAISettings
-
+from app.modules.services.ai.chatgpt_messaging import send_message_to_chatgpt
 
 from app.modules.services.journal.journal_services import (
     get_or_create_today_entry,
@@ -28,6 +28,9 @@ class JournalUpdatePayload(BaseModel):
 
 class TodayJournalRequest(BaseModel):
     local_date: str
+
+class AIQuestionRequest(BaseModel):
+    content: str
 
 CHUNK_THRESHOLD_BYTES = 8_000   # lower threshold for quicker send
 FLUSH_INTERVAL_MS = 300         # shorter flush interval
@@ -214,6 +217,30 @@ async def update_entry(
     if not success:
         raise HTTPException(status_code=403, detail="Update failed")
     return {"status": "save ok"}
+
+
+@router.post("/reflect")
+async def generate_reflective_question(
+    payload: AIQuestionRequest,
+    current_user=Depends(AuthenticationUtils.get_authenticated_user),
+):
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You help journal users reflect. "
+                "Given their entry, ask one short question to prompt deeper thought."
+            ),
+        },
+        {"role": "user", "content": payload.content},
+    ]
+
+    try:
+        response, _ = await send_message_to_chatgpt(messages, current_user)
+        return {"question": response.strip()}
+    except Exception as e:
+        logger.error(f"Failed to generate reflective question: {e}")
+        raise HTTPException(status_code=500, detail="AI generation failed")
 
 
 

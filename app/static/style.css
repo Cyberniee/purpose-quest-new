@@ -105,6 +105,26 @@ h3 {
   background: transparent;
 }
 
+.ai-prompt,
+.ai-question {
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.regen-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ai-question-area {
+  align-self: flex-start;
+}
+
 .btn-primary:focus {
   border-color: var(--color-accent);
 }
