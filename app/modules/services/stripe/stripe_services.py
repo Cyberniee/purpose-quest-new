@@ -1,5 +1,8 @@
 import logging
-from app.config.auth_config import supabase_client as supabase
+from app.config.auth_config import (
+    supabase_client as supabase,
+    set_supabase_service_role,
+)
 from app.utils.common_utils import validate_data_presence
 from app.config.stripe_config import stripe_client as stripe
 
@@ -30,6 +33,7 @@ async def fetch_available_products_from_stripe():
         raise
 
 async def sync_report_types_with_stripe():
+    set_supabase_service_role(True)
     try:
         stripe_products = stripe.Product.list(active=True, limit=100).get("data", [])
         for product in stripe_products:
@@ -61,3 +65,5 @@ async def sync_report_types_with_stripe():
     except Exception as e:
         logging.error(f"Stripe sync failed: {e}")
         raise
+    finally:
+        set_supabase_service_role(False)

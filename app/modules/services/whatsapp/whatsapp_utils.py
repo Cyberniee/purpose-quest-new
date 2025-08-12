@@ -10,6 +10,7 @@ from app.db.db_operations.messages import msg_is_processed, insert_msg_status, u
 from app.db.db_operations.wa_link_tokens import get_user_id_from_token, update_token_validity
 from app.modules.services.users.user_services import link_wa_account_to_user
 from app.utils.messaging_utils import wa_text_msg_handler
+from app.config.auth_config import set_supabase_service_role
 
 logger = logging.getLogger(__name__)
 
@@ -116,14 +117,17 @@ async def handle_status_update(status_data):
     status_id = status_data['id']
     status = status_data['status']
 
-    # current code checks if the message already exists, which is does, because it is a status update
-    # if it does not exist yet, it will be inserted. If it exists, it will update it.
-    if await is_processed(status_id):
-        # logger.info(f"updating message {status_data}")
-        await update_msg_status(message_id=status_id, status=status)
-    else:
-        await insert_msg_status(message_id=status_id, status=status)
-        logger.warning(f"inserting another empty message: {status_data}")
+    set_supabase_service_role(True)
+    try:
+        # current code checks if the message already exists, which it does, because it is a status update
+        # if it does not exist yet, it will be inserted. If it exists, it will update it.
+        if await is_processed(status_id):
+            await update_msg_status(message_id=status_id, status=status)
+        else:
+            await insert_msg_status(message_id=status_id, status=status)
+            logger.warning(f"inserting another empty message: {status_data}")
+    finally:
+        set_supabase_service_role(False)
 
 async def get_media_url(media_id):
     headers = get_wa_headers()

@@ -2,7 +2,10 @@ import logging, secrets
 from fastapi import APIRouter, Request, Header, HTTPException
 from app.config import config
 from app.config.stripe_config import stripe_client as stripe
-from app.config.auth_config import supabase_client as supabase
+from app.config.auth_config import (
+    supabase_client as supabase,
+    set_supabase_service_role,
+)
 from app.utils.common_utils import validate_data_presence
 
 router = APIRouter()
@@ -42,6 +45,7 @@ async def stripe_webhook_handler(request: Request, stripe_signature: str = Heade
     sig_header = stripe_signature
     endpoint_secret = config.stripe.webhook_secret
 
+    set_supabase_service_role(True)
     try:
         event = stripe.Webhook.construct_event(
             payload=payload,
@@ -54,12 +58,12 @@ async def stripe_webhook_handler(request: Request, stripe_signature: str = Heade
 
         # Handle the event (you can add more cases as needed)
         if event["type"] == "checkout.session.completed":
-            
+
             session = event["data"]["object"]
             user_id = session["metadata"]["user_id"]
             report_type_stripe_id = session["metadata"]["report_type_id"]
             payment_id = session["payment_intent"]
-            
+
             response = supabase.table("report_types").select("id").eq("stripe_id", report_type_stripe_id).single().execute()
             if not validate_data_presence(response):
                 raise HTTPException(status_code=404, detail="Report type not found")
@@ -83,3 +87,5 @@ async def stripe_webhook_handler(request: Request, stripe_signature: str = Heade
     except stripe.error.SignatureVerificationError as e:
         logging.error(f"Signature verification failed: {e}")
         raise HTTPException(status_code=400, detail="Invalid signature")
+    finally:
+        set_supabase_service_role(False)

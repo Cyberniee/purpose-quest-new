@@ -1,7 +1,10 @@
 # app/modules/tasks/report_generation.py
 
 from app.celery_worker import celery_app
-from app.config.auth_config import supabase_client as supabase
+from app.config.auth_config import (
+    supabase_client as supabase,
+    set_supabase_service_role,
+)
 from app.core.ai_client import get_openai_client
 from app.config import config
 import logging, time, random
@@ -21,6 +24,7 @@ LOREM_TEXTS = [
 
 @celery_app.task
 def generate_report_chapter(chapter_data):
+    set_supabase_service_role(True)
     try:
         # Extract necessary data from chapter_data
         report_type_id = chapter_data["report_type_id"]
@@ -78,10 +82,13 @@ def generate_report_chapter(chapter_data):
 
     except Exception as e:
         logger.error(f"Failed to generate chapter: {e}")
+    finally:
+        set_supabase_service_role(False)
         
 
 @celery_app.task
 def generate_report_chapter_mock(chapter_data):
+    set_supabase_service_role(True)
     try:
         # Simulate OpenAI API delay
         time.sleep(10)
@@ -130,3 +137,5 @@ def generate_report_chapter_mock(chapter_data):
 
     except Exception as e:
         logger.error(f"[MOCK] Failed to generate chapter: {e}")
+    finally:
+        set_supabase_service_role(False)

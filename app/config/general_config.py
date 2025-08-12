@@ -19,7 +19,8 @@ class ProjectSettings:
 @dataclass
 class SupabaseSettings:
     supabase_url: str = os.getenv("SUPABASE_URL", "")
-    supabase_key: str = os.getenv("SUPABASE_API_KEY", "")
+    service_role_key: str = os.getenv("SUPABASE_API_KEY", "")
+    anon_key: str = os.getenv("SUPABASE_ANON_KEY", "")
     jwt_secret: str = os.getenv("JWT_SECRET", "")
 
 @dataclass

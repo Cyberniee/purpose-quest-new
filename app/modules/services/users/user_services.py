@@ -1,7 +1,10 @@
 import logging, pytz
 from datetime import datetime, timedelta
 from uuid import UUID
-from app.config.auth_config import supabase_client as supabase
+from app.config.auth_config import (
+    supabase_client as supabase,
+    set_supabase_service_role,
+)
 from app.utils.common_utils import validate_data_presence
 from app.db.db_operations.subscriptions import get_consumption, update_consumption_data, update_sub_data
 from app.db.db_operations.whatsapp_accounts import link_wa_to_user
@@ -13,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 async def create_user(sub: UUID, email: str, name: str = "") -> dict:
+    set_supabase_service_role(True)
     try:
         user_create_response = (
             supabase.table("users")
@@ -72,7 +76,8 @@ async def create_user(sub: UUID, email: str, name: str = "") -> dict:
     
     except Exception as e:
         logger.error(f"something went wrong creating the user subscription: {e}")
-
+    finally:
+        set_supabase_service_role(False)
 
 async def delete_user(user_id: UUID) -> None:
     try:

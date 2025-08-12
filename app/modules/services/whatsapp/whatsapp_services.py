@@ -8,6 +8,7 @@ from app.config.general_config import SubscriptionVariables
 from app.utils.messaging_utils import wa_text_msg_handler
 from app.db.db_operations.messages import update_msg_status, insert_message
 from app.db.db_operations.whatsapp_accounts import get_user_from_number
+from app.config.auth_config import set_supabase_service_role
 from .whatsapp_utils import is_old_msg, process_command, extract_message_details, cleanup_audio_files
 from .whatsapp_utils import link_new_phone_number
 
@@ -17,6 +18,7 @@ logger = logging.getLogger(__name__)
 # DEV changed this one...
 async def handle_new_message(message_data):
     logger.info(f"in handle new msg with: {message_data}")
+    set_supabase_service_role(True)
     try:
         message_id, from_num, content, message_type, timestamp, audio_id, mime_type, context_msg_id = await extract_message_details(message_data)
         entry_id = None
@@ -61,6 +63,7 @@ async def handle_new_message(message_data):
         # Always update message status, regardless of previous errors
         status = "processed"
         await update_msg_status(message_id=message_id, status=status, entry_id=entry_id)
+        set_supabase_service_role(False)
 
 
 # we essentially want to reply to the same source as that we got the msg from.
