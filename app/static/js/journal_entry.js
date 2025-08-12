@@ -105,6 +105,38 @@ export async function loadJournalEntryFromDOM() {
     setupBackButton(textarea);
 }
 
+export function setupAIReflection() {
+    const askBtn = document.getElementById("ask-ai-btn");
+    const output = document.getElementById("ai-question-output");
+    const textSpan = document.getElementById("ai-question-text");
+    const regenBtn = document.getElementById("ai-question-regenerate");
+    const textarea = document.getElementById("journal-textarea");
+
+    if (!askBtn || !output || !textSpan || !regenBtn || !textarea) return;
+
+    async function generateQuestion() {
+        const text = textarea.value.trim();
+
+        try {
+            const res = await fetch("/api/journal/reflect", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: text })
+            });
+            const data = await res.json();
+            textSpan.textContent = data.question || "";
+        } catch (err) {
+            console.error("AI question error:", err);
+            textSpan.textContent = "Could not generate question.";
+        }
+
+        output.classList.remove("d-none");
+    }
+
+    askBtn.addEventListener("click", generateQuestion);
+    regenBtn.addEventListener("click", generateQuestion);
+}
+
 
 
 

@@ -35,6 +35,11 @@
                         Welcome back, <span id="user-name-placeholder"></span>ready to reflect?
                     </h2>
 
+                    <div id="daily-prompt-container" class="ai-prompt mb-4">
+                        <span id="daily-prompt-text"></span>
+                        <button id="daily-prompt-regenerate" class="regen-btn" title="New prompt">🔄</button>
+                    </div>
+
                     {% if has_today_entry %}
                     <a href="/journal/today" class="btn btn-primary mt-1 p-3" data-label="continue-writing-btn" id="start-writing-btn">
                         Continue today’s entry
@@ -88,7 +93,7 @@
     </div>
 
     <script type="module">
-        import { initializeJournalDashboard, setupMockButton } from "/static/js/dashboard.js";
+        import { initializeJournalDashboard, setupMockButton, setupDailyPrompt } from "/static/js/dashboard.js";
         import { setupMobileSidebar } from '/static/js/mobile_ui.js';
         import { blurButtonsOnMouseUp } from "/static/js/utils.js";
 
@@ -120,6 +125,7 @@
             setupMobileSidebar();
             initializeJournalDashboard();
             setupMockButton();
+            setupDailyPrompt();
             injectUserName();
             blurButtonsOnMouseUp();
 

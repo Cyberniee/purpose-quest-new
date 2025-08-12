@@ -54,6 +54,14 @@
                         <textarea id="journal-textarea" class="form-control flex-grow-1"
                             placeholder="Start writing here..."></textarea>
 
+                        <div class="ai-question-area mt-2">
+                            <button id="ask-ai-btn" class="btn btn-secondary btn-sm" data-label="ai-question-btn">🧠 Ask AI</button>
+                            <div id="ai-question-output" class="ai-question d-none mt-2">
+                                <span id="ai-question-text"></span>
+                                <button id="ai-question-regenerate" class="regen-btn" title="Try another">🔄</button>
+                            </div>
+                        </div>
+
                         <!-- Voice Control Wrapper -->
                         <div class="position-relative">
                             <!-- Voice Control Buttons -->
@@ -125,7 +133,7 @@
 
 
 <script type="module">
-    import { loadJournalEntryFromDOM } from "/static/js/journal_entry.js";
+    import { loadJournalEntryFromDOM, setupAIReflection } from "/static/js/journal_entry.js";
     import { setupMobileSidebar } from '/static/js/mobile_ui.js';
     import { setupVoiceControl } from '/static/js/voice_control.js';
     import { blurButtonsOnMouseUp } from "/static/js/utils.js";
@@ -136,6 +144,7 @@
         setupMobileSidebar();
         loadJournalEntryFromDOM();
         setupVoiceControl();
+        setupAIReflection();
         blurButtonsOnMouseUp();
 
     });

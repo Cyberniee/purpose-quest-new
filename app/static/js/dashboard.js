@@ -82,3 +82,25 @@ export function setupMockButton() {
     });
 }
 
+export function setupDailyPrompt() {
+    const promptEl = document.getElementById("daily-prompt-text");
+    const regenBtn = document.getElementById("daily-prompt-regenerate");
+    if (!promptEl || !regenBtn) return;
+
+    const prompts = [
+        "What are you grateful for today?",
+        "Describe a challenge you overcame recently.",
+        "What made you smile today?",
+        "How did you take care of yourself today?",
+        "What is something you learned this week?"
+    ];
+
+    function showRandomPrompt() {
+        const random = prompts[Math.floor(Math.random() * prompts.length)];
+        promptEl.textContent = random;
+    }
+
+    regenBtn.addEventListener("click", showRandomPrompt);
+    showRandomPrompt();
+}
+
