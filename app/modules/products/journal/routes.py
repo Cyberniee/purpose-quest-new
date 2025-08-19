@@ -224,12 +224,14 @@ async def generate_reflective_question(
     payload: AIQuestionRequest,
     current_user=Depends(AuthenticationUtils.get_authenticated_user),
 ):
+    reflection_prompt_res = supabase.table("prompts").select("prompt").eq("type", "reflection").single().execute()
+    prompt = reflection_prompt_res.data.get("prompt", "")
+    
     messages = [
         {
             "role": "system",
             "content": (
-                "You help journal users reflect. "
-                "Given their entry, ask one short question to prompt deeper thought."
+                prompt
             ),
         },
         {"role": "user", "content": payload.content},
